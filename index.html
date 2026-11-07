@@ -1,0 +1,1408 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Plan B Prototyp</title>
+<meta name="description" content="Klickbarer Prototyp des Anschluss-Assistenten Plan B (Schulprojekt ÜK 368, Element c) mit Szenario, Vergleichsvariante und Testmodus.">
+<meta name="theme-color" content="#2E9E6A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232E9E6A%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-family=%27Arial,sans-serif%27 font-size=%2720%27 font-weight=%27700%27 fill=%27white%27 text-anchor=%27middle%27%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: links die Szene (Kontext wie im Storyboard), in der Mitte das Smartphone, rechts die Moderation (einblendbar).
+   Farben und Schriften aus dem Moodboard von Element b: Nachtblau, Warmweiss, Plan-B-Gruen, Bernstein, Signalrot; Inter + Caveat. */
+:root{
+  --bg:#F5F2EB; --surface:#FFFFFF; --surface-2:#ECE7DC; --ink:#1F2E44; --muted:#5B6677; --line:#DCD5C6;
+  --accent:#2E9E6A; --accent-strong:#1E7D52; --on-accent:#FFFFFF;
+  --warn:#A9690C; --warn-bg:#FBEED6; --bad:#C0303A; --bad-bg:#F9E1E2; --ok-bg:#E1F1E8;
+  --map-ink:#1F2E44;
+  --f-ui:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --f-hand:"Caveat","Segoe Print","Bradley Hand",cursive;
+  /* Smartphone: eigene App-Oberflaeche, bleibt in beiden Themes hell */
+  --p-bg:#F3F1EC; --p-card:#FFFFFF; --p-ink:#1F2E44; --p-muted:#667180; --p-line:#E4DFD5; --p-soft:#ECE8E0;
+  --p-green:#2E9E6A; --p-green-ink:#1A7349; --p-green-bg:#E2F2E8;
+  --p-amber:#F2A93B; --p-amber-ink:#80520A; --p-amber-bg:#FDEFD8;
+  --p-red:#D9363E; --p-red-ink:#A3222A; --p-red-bg:#FBE4E5;
+  --p-nacht:#1F2E44; --p-frame:#101826;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111A27; --surface:#1A2536; --surface-2:#243248; --ink:#ECEFF4; --muted:#9DA9BA; --line:#2E3C52;
+    --accent:#3DB87F; --accent-strong:#66D1A0; --on-accent:#0B1A12;
+    --warn:#F2B357; --warn-bg:#3A2D17; --bad:#F07A82; --bad-bg:#3C1F24; --ok-bg:#16301F; --map-ink:#DDE3EC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111A27; --surface:#1A2536; --surface-2:#243248; --ink:#ECEFF4; --muted:#9DA9BA; --line:#2E3C52;
+  --accent:#3DB87F; --accent-strong:#66D1A0; --on-accent:#0B1A12;
+  --warn:#F2B357; --warn-bg:#3A2D17; --bad:#F07A82; --bad-bg:#3C1F24; --ok-bg:#16301F; --map-ink:#DDE3EC;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- Kopfzeile ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line);
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-badge{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;font-size:19px;flex:none}
+.brand-name{font-weight:800;font-size:18px;letter-spacing:-.01em;line-height:1.1}
+.brand-sub{font-size:12px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.tbtn svg{width:16px;height:16px}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* ---------- Buehne ---------- */
+.stage{display:grid;grid-template-columns:minmax(260px,360px) auto;justify-content:center;align-items:start;gap:28px;
+  padding-block:22px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.stage.with-mod{grid-template-columns:minmax(250px,330px) auto minmax(320px,400px)}
+@media (max-width:1180px){.stage.with-mod{grid-template-columns:minmax(250px,340px) auto}.stage.with-mod .mod{grid-column:1 / -1;max-width:980px;width:100%;justify-self:center}}
+@media (max-width:780px){.stage,.stage.with-mod{grid-template-columns:minmax(0,1fr);gap:16px}.device-wrap{justify-self:center}}
+
+/* ---------- Szene ---------- */
+.scene{display:flex;flex-direction:column;gap:14px;min-width:0;position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px)}
+@media (max-width:780px){.scene{position:static}}
+.scene-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.scene-meta{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.clock{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.place{color:var(--muted);font-size:13px}
+.vtag{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:6px;background:var(--ok-bg);color:var(--accent-strong)}
+.vtag.heute{background:var(--surface-2);color:var(--muted)}
+.linemap{background:var(--bg);border-radius:12px;padding:6px 4px}
+.linemap svg{display:block;width:100%;height:auto}
+.lm-text{font:600 10.5px var(--f-ui);fill:var(--map-ink)}
+.lm-small{font:500 9.5px var(--f-ui);fill:var(--muted)}
+.lm-green{fill:var(--accent-strong)}
+.lm-warn{fill:var(--warn)}
+.lm-bad{fill:var(--bad)}
+.dots{display:flex;gap:5px;align-items:center}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots span.on{background:var(--accent)}
+.dots span.done{background:var(--muted)}
+.dots em{font-style:normal;font-size:12px;color:var(--muted);margin-left:6px}
+.scene h2{margin:2px 0 0;font-size:21px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+.scene p{margin:0}
+.thought{font-family:var(--f-hand);font-size:25px;line-height:1.1;color:var(--accent-strong)}
+.thought.tense{color:var(--warn)}
+.durchsage{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.durchsage button{flex:none;width:34px;height:34px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);display:grid;place-items:center}
+.durchsage button svg{width:17px;height:17px}
+.lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.board{background:#0F1A2A;color:#F6F3EA;border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.board .row{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:baseline;font-variant-numeric:tabular-nums}
+.board .x{color:#FF8A8F;font-weight:700}
+.board .go{color:#7FE0AE;font-weight:700}
+.board .cap{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#9FB0C6}
+.hint{font-size:13.5px;color:var(--accent-strong);font-weight:600;display:flex;gap:6px;align-items:center}
+.scene-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-ghost{background:var(--surface-2);color:var(--ink)}
+.about{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:13.5px}
+.about summary{font-weight:700;cursor:pointer}
+.about ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.about p{margin:8px 0 0;color:var(--muted)}
+
+/* ---------- Smartphone ---------- */
+.device-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;width:384px;max-width:100%}
+.phone{width:384px;max-width:100%;background:var(--p-frame);border-radius:50px;padding:11px;position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 30px 60px -20px rgba(16,24,38,.45),0 0 0 1px var(--line)}
+.screen{position:relative;border-radius:40px;overflow:hidden;height:min(760px,calc(100svh - 150px));min-height:640px;background:var(--p-bg);color:var(--p-ink);display:flex;flex-direction:column;font-size:14px}
+@media (max-width:420px){.phone{border-radius:34px;padding:7px}.screen{border-radius:28px;height:min(720px,calc(100svh - 40px));min-height:600px}}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:104px;height:28px;border-radius:20px;background:#05080D;z-index:12}
+.sbar{height:46px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 26px 0;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;position:relative;z-index:11}
+.sbar .ic{display:flex;gap:5px;align-items:center}
+.sbar svg{width:17px;height:12px}
+.screen.dark .sbar{color:#fff}
+.view{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+.view::-webkit-scrollbar{width:0}
+.pad{padding:0 16px 18px;display:flex;flex-direction:column;gap:12px}
+.appbar{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;padding:4px 8px 8px;position:sticky;top:0;background:var(--p-bg);z-index:3}
+.appbar .t{text-align:center;font-weight:700;font-size:15.5px}
+.ib{width:36px;height:36px;border:0;border-radius:50%;background:transparent;display:grid;place-items:center;color:var(--p-ink)}
+.ib:hover{background:var(--p-soft)}
+.ib svg{width:20px;height:20px}
+.card{background:var(--p-card);border-radius:16px;padding:14px;box-shadow:0 1px 0 var(--p-line)}
+.muted{color:var(--p-muted)}
+.small{font-size:12.5px}
+.route-h{font-weight:800;font-size:19px;letter-spacing:-.01em;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.route-h .arr{color:var(--p-muted);font-weight:500}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--p-soft);color:var(--p-ink)}
+.chip svg{width:13px;height:13px}
+.pill{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;padding:6px 11px;border-radius:999px}
+.pill::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--p-green-bg);color:var(--p-green-ink)}
+.pill.ok::before{background:var(--p-green)}
+.pill.warn{background:var(--p-amber-bg);color:var(--p-amber-ink)}
+.pill.warn::before{background:var(--p-amber);animation:blink 1.6s ease-in-out infinite}
+.pill.bad{background:var(--p-red-bg);color:var(--p-red-ink)}
+.pill.bad::before{background:var(--p-red)}
+.pill.neutral{background:var(--p-soft);color:var(--p-muted)}
+@keyframes blink{50%{opacity:.35}}
+.pbtn{border:0;border-radius:14px;padding:13px 16px;font-weight:700;font-size:15px;width:100%;background:var(--p-green);color:#fff;display:flex;justify-content:center;align-items:center;gap:8px}
+.pbtn svg{width:18px;height:18px}
+.pbtn.dark{background:var(--p-nacht)}
+.pbtn.line{background:transparent;border:1.5px solid var(--p-line);color:var(--p-ink)}
+.pbtn[disabled]{opacity:.4;cursor:not-allowed}
+.link{border:0;background:transparent;padding:6px 0;color:var(--p-green-ink);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:4px}
+.link svg{width:16px;height:16px}
+.alert{border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.alert.warn{background:var(--p-amber-bg)}
+.alert.bad{background:var(--p-red-bg)}
+.alert.ok{background:var(--p-green-bg)}
+.alert h3{margin:0;font-size:16px;display:flex;align-items:center;gap:8px}
+.alert p{margin:0}
+.dotw{width:10px;height:10px;border-radius:50%;background:var(--p-amber);flex:none;animation:blink 1.6s ease-in-out infinite}
+.planb{border:2px solid var(--p-green);border-radius:18px;background:var(--p-card);overflow:hidden}
+.planb-h{background:var(--p-green);color:#fff;padding:9px 14px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.planb-h small{font-weight:600;opacity:.9;font-size:12px}
+.planb-b{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.ticket{display:flex;gap:7px;align-items:center;font-weight:700;font-size:13px}
+.ticket svg{width:17px;height:17px;flex:none}
+.ticket.ok{color:var(--p-green-ink)}
+.ticket.bad{color:var(--p-red-ink)}
+.ticket.warn{color:var(--p-amber-ink)}
+.calm{font-size:13px;color:var(--p-muted);display:flex;gap:8px;align-items:flex-start}
+.calm svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--p-green)}
+
+/* Zeitachse */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:52px 18px 1fr;column-gap:8px;align-items:start}
+.tl .tm{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;line-height:1.25;padding-top:1px}
+.tl .tm s{display:block;color:var(--p-muted);font-weight:500;font-size:12px}
+.tl .dl{display:block;font-size:12px;color:var(--p-red-ink);font-weight:700}
+.tl .rail{position:relative;height:100%;min-height:22px;display:flex;justify-content:center}
+.tl .rail::before{content:"";position:absolute;top:0;bottom:0;width:3px;background:var(--p-nacht);border-radius:2px}
+.tl li.first .rail::before{top:9px}
+.tl li.last .rail::before{bottom:auto;height:9px}
+.tl .rail i{position:relative;margin-top:4px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--p-nacht);z-index:1}
+.tl li.leg .rail i{display:none}
+.tl li.walk .rail::before{background:repeating-linear-gradient(var(--p-muted) 0 3px,transparent 3px 7px)}
+.tl li.walk .rail i{display:none}
+.tl.green .rail::before{background:var(--p-green)}
+.tl.green .rail i{border-color:var(--p-green)}
+.tl .bd{padding-bottom:10px;min-width:0}
+.tl .st{font-weight:700}
+.tl .sb{font-size:12.5px;color:var(--p-muted)}
+.tl li.leg .bd{padding:2px 0 12px}
+.mode{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;font-weight:700;background:var(--p-soft);border-radius:8px;padding:3px 8px}
+.mode svg{width:14px;height:14px}
+.occ{display:inline-flex;gap:1px;vertical-align:-2px;margin-left:6px}
+.occ svg{width:11px;height:11px}
+.occ .off{opacity:.25}
+.tabbar{flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:var(--p-card);border-top:1px solid var(--p-line);padding:6px 4px 16px;position:sticky;bottom:0;z-index:3}
+.view > .pad{flex:1 0 auto}
+.tabbar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--p-muted);padding:4px 0}
+.tabbar button svg{width:22px;height:22px}
+.tabbar button.on{color:var(--p-green-ink)}
+
+/* Sperrbildschirm */
+.lock{flex:1;display:flex;flex-direction:column;color:#fff;background:radial-gradient(120% 60% at 50% 115%,rgba(242,169,59,.55),transparent 60%),linear-gradient(180deg,#1A2638 0%,#22324B 55%,#3B3F52 100%)}
+.screen.dark{background:#1A2638}
+.lock-top{text-align:center;padding:26px 0 18px}
+.lock-date{font-weight:600;font-size:16px;opacity:.9}
+.lock-time{font-size:84px;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.lock-stack{padding:0 12px;display:flex;flex-direction:column;gap:10px}
+.la{background:rgba(12,18,28,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:24px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.la-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.la-h .b{width:22px;height:22px;border-radius:6px;background:var(--p-green);display:grid;place-items:center;font-size:12px;font-weight:800}
+.la-h .st{margin-left:auto;display:inline-flex;gap:6px;align-items:center;font-size:12px}
+.la-h .st i{width:9px;height:9px;border-radius:50%;background:var(--p-amber);animation:blink 1.6s infinite}
+.la-h .st.neutral i{background:#9FB0C6;animation:none}
+.la-bar{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.18)}
+.la-bar b{position:absolute;left:0;top:0;bottom:0;width:62%;border-radius:3px;background:var(--p-amber)}
+.la-bar.neutral b{background:#9FB0C6;width:30%}
+.la-row{display:flex;justify-content:space-between;font-size:12.5px;font-variant-numeric:tabular-nums;opacity:.92}
+.la-row strong{font-size:15px}
+.la-plan{font-size:12.5px;display:flex;gap:6px;align-items:center;color:#9FE6C0;font-weight:600}
+.la-plan svg{width:14px;height:14px}
+.notif{background:rgba(250,248,244,.94);color:var(--p-ink);border-radius:22px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;border:0;text-align:left;width:100%;animation:drop .5s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes drop{from{transform:translateY(-24px);opacity:0}to{transform:none;opacity:1}}
+.notif-h{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--p-muted);font-weight:600}
+.notif-h .b{width:22px;height:22px;border-radius:6px;background:var(--p-green);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800}
+.notif-h .b.grey{background:var(--p-nacht)}
+.notif-h .b svg{width:14px;height:14px}
+.notif-h span:last-child{margin-left:auto}
+.notif strong{font-size:15px;display:flex;gap:7px;align-items:center}
+.notif .np{display:block;margin:0;font-size:13.5px;line-height:1.35}
+.notif .nact{margin-top:4px;background:var(--p-green);color:#fff;border-radius:12px;padding:9px;text-align:center;font-weight:700;font-size:14px}
+.lock-bottom{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding:0 34px 26px}
+.lk{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.lk svg{width:20px;height:20px}
+.lk-hint{font-size:12px;opacity:.7}
+.wake{flex:1;display:grid;place-items:center;text-align:center;color:rgba(255,255,255,.7);font-size:13px;padding:0 30px}
+
+/* Sheets, Toast */
+.sheet-bg{position:absolute;inset:0;background:rgba(15,24,38,.42);z-index:20;display:flex;align-items:flex-end;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--p-bg);width:100%;max-height:88%;overflow:auto;border-radius:24px 24px 0 0;padding:8px 16px 22px;display:flex;flex-direction:column;gap:12px;animation:up .28s cubic-bezier(.2,.9,.3,1)}
+@keyframes up{from{transform:translateY(40%)}}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--p-line);margin:2px auto 2px}
+.sheet h3{margin:0;font-size:18px}
+.msg{width:100%;min-height:86px;border:1.5px solid var(--p-line);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:var(--p-card);color:var(--p-ink);resize:vertical}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--p-card);border-radius:14px;padding:10px 12px}
+.toggle .tx{display:flex;flex-direction:column}
+.toggle .tx b{font-size:14px}
+.sw{width:46px;height:28px;border-radius:14px;background:var(--p-line);border:0;position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s}
+.sw[aria-checked="true"]{background:var(--p-green)}
+.sw[aria-checked="true"]::after{transform:translateX(18px)}
+.rcpts{display:flex;gap:14px}
+.rc{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:600}
+.rc i{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:18px;color:#fff;background:var(--p-nacht);outline:3px solid transparent;outline-offset:2px}
+.rc.k i{background:var(--p-green)}
+.rc.m i{background:#4E6A8F}
+.rc[aria-pressed="true"] i{outline-color:var(--p-green)}
+.bubble{align-self:flex-end;max-width:82%;background:var(--p-green);color:#fff;border-radius:18px 18px 4px 18px;padding:9px 12px;font-size:14px}
+.bubble.in{align-self:flex-start;background:var(--p-card);color:var(--p-ink);border-radius:18px 18px 18px 4px}
+.typing{align-self:flex-start;font-size:12px;color:var(--p-muted)}
+.toast{position:absolute;left:16px;right:16px;bottom:86px;z-index:30;background:var(--p-nacht);color:#fff;border-radius:14px;padding:11px 14px;font-size:13.5px;animation:up .25s}
+.webcard{background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--p-line)}
+.webbar{background:var(--p-soft);padding:7px 10px;font-size:11.5px;color:var(--p-muted);display:flex;gap:6px;align-items:center}
+.webbar svg{width:12px;height:12px}
+.webbody{padding:14px;display:flex;flex-direction:column;gap:10px}
+.prog{display:flex;align-items:center;gap:0;margin:4px 0}
+.prog i{width:12px;height:12px;border-radius:50%;background:var(--p-green);flex:none}
+.prog i.o{background:#fff;border:3px solid var(--p-green)}
+.prog b{flex:1;height:3px;background:var(--p-green)}
+.prog b.o{background:repeating-linear-gradient(90deg,var(--p-green) 0 5px,transparent 5px 9px)}
+.prog-l{display:flex;justify-content:space-between;font-size:11.5px;color:var(--p-muted);font-variant-numeric:tabular-nums}
+
+/* Fahrplan heute */
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:700;color:var(--p-muted)}
+.field input{border:1.5px solid var(--p-line);border-radius:12px;padding:11px 12px;font:inherit;font-size:15px;background:var(--p-card);color:var(--p-ink)}
+.sugg{display:flex;flex-direction:column;background:var(--p-card);border-radius:12px;overflow:hidden}
+.sugg button{border:0;background:transparent;text-align:left;padding:10px 12px;border-bottom:1px solid var(--p-line)}
+.res{border:0;width:100%;text-align:left;background:var(--p-card);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.res-top{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
+.res-top b{font-size:17px}
+.res-mid{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--p-muted)}
+.alt{background:var(--p-card);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;border:2px solid transparent}
+.alt.rec{border-color:var(--p-green)}
+.alt-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+.alt-top b{font-size:17px}
+.tag{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--p-green-bg);color:var(--p-green-ink)}
+.alt .pbtn{padding:10px;font-size:14px}
+
+/* Umsteige-Hilfe, Bilanz */
+.big-where{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.map{background:var(--p-card);border-radius:16px;padding:8px}
+.map svg{display:block;width:100%;height:auto}
+.mp-t{font:700 10px var(--f-ui);fill:#1F2E44}
+.mp-s{font:600 9px var(--f-ui);fill:#667180}
+.walkpath{fill:none;stroke:var(--p-green);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:7 7;animation:march 1s linear infinite}
+@keyframes march{to{stroke-dashoffset:-14}}
+.steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:24px 1fr;gap:8px;font-size:13.5px}
+.steps li::before{counter-increment:s;content:counter(s);width:22px;height:22px;border-radius:50%;background:var(--p-nacht);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.hero{text-align:center;padding:10px 0 4px}
+.hero .n{font-size:46px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--p-line);font-size:13.5px}
+.kv:last-child{border-bottom:0}
+.kv span:last-child{text-align:right;font-weight:600}
+.saved{background:var(--p-green-bg);color:var(--p-green-ink);border-radius:14px;padding:12px 14px;font-weight:700;display:flex;gap:8px;align-items:center}
+.saved svg{width:20px;height:20px;flex:none}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.checks li{display:flex;gap:8px;align-items:center;font-size:14px}
+.checks svg{width:18px;height:18px;color:var(--p-green);flex:none}
+.bigcheck{width:76px;height:76px;border-radius:50%;background:var(--p-green);color:#fff;display:grid;place-items:center;margin:8px auto 2px;animation:pop .5s cubic-bezier(.2,.9,.3,1.4)}
+.bigcheck svg{width:40px;height:40px}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.compcard{background:var(--p-card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+
+/* ---------- Moderation ---------- */
+.mod{background:var(--surface);border:1px solid var(--line);border-radius:18px;min-width:0;display:flex;flex-direction:column;max-height:calc(100svh - 110px);position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px)}
+@media (max-width:1180px){.mod{position:static;max-height:none}}
+.mod-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.mod-head strong{font-size:15px}
+.mod-body{overflow:auto;padding:14px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.mod-body > *{flex:none}
+.mod h4{margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mbox{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.mrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mrow > *{min-width:0}
+.mlabel{font-size:12.5px;font-weight:600;display:flex;flex-direction:column;gap:4px}
+.mrow > .mlabel{flex:1 1 140px}
+.mod input[type=text],.mod select,.mod textarea{font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:var(--bg);color:var(--ink);width:100%}
+.mod textarea{min-height:56px;resize:vertical}
+.mbtn{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:7px 11px;font-size:13px;font-weight:700;color:var(--ink)}
+.mbtn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.mbtn.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.mbtn.bad{background:var(--bad-bg);border-color:transparent;color:var(--bad)}
+.task{border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}
+.task > summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;gap:8px;align-items:center;font-weight:700;font-size:14px}
+.task > summary::-webkit-details-marker{display:none}
+.task .no{width:24px;height:24px;border-radius:7px;background:var(--surface-2);display:grid;place-items:center;font-size:12.5px;flex:none}
+.task.run{border-color:var(--accent)}
+.task.run .no{background:var(--accent);color:var(--on-accent)}
+.task.done .no{background:var(--ink);color:var(--bg)}
+.st-chip{margin-left:auto;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.st-chip.run{background:var(--ok-bg);color:var(--accent-strong)}
+.st-chip.ok{background:var(--ok-bg);color:var(--accent-strong)}
+.st-chip.help{background:var(--warn-bg);color:var(--warn)}
+.st-chip.fail{background:var(--bad-bg);color:var(--bad)}
+.task-b{padding:0 12px 12px;display:flex;flex-direction:column;gap:9px}
+.say{margin:0;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.say b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.meta{font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+.meta p{margin:0}
+.meta b{color:var(--muted);font-weight:700}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
+.metric{background:var(--bg);border-radius:9px;padding:7px 9px}
+.metric span{display:block;font-size:11px;color:var(--muted)}
+.metric strong{font-size:14px;font-variant-numeric:tabular-nums}
+.scale{display:flex;gap:4px;flex-wrap:wrap}
+.scale button{width:32px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-weight:700;font-size:13px}
+.scale button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.qlist{margin:0;padding-left:16px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.evlog{font-size:11.5px;color:var(--muted);max-height:90px;overflow:auto;font-variant-numeric:tabular-nums;background:var(--bg);border-radius:8px;padding:6px 8px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tbl{border-collapse:collapse;font-size:12.5px;width:100%;min-width:420px}
+.tbl th,.tbl td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{background:var(--surface-2);font-size:11.5px}
+.tbl td{font-variant-numeric:tabular-nums}
+.verdict{font-weight:700;font-size:12px;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.v-ok{background:var(--ok-bg);color:var(--accent-strong)}
+.v-part{background:var(--warn-bg);color:var(--warn)}
+.v-no{background:var(--bad-bg);color:var(--bad)}
+.v-open{background:var(--surface-2);color:var(--muted)}
+.empty{color:var(--muted);font-size:13.5px;background:var(--bg);border-radius:12px;padding:14px}
+.copyout{min-height:110px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
+
+.foot{padding-block:10px 22px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));text-align:center;font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="brand-badge" aria-hidden="true">B</div>
+    <div><div class="brand-name">Plan B</div><div class="brand-sub">Interaktiver Prototyp · Anschluss-Assistent · ÜK 368 Element c</div></div>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Variante">
+      <button id="vHeute" data-act="variant" data-v="heute" aria-pressed="false">Heute</button>
+      <button id="vPlanb" data-act="variant" data-v="planb" aria-pressed="true">Mit Plan B</button>
+    </div>
+    <button class="tbtn" id="soundBtn" data-act="sound" aria-pressed="true" title="Ton für Mitteilung und Durchsage"></button>
+    <button class="tbtn" data-act="restart" title="Szenario neu starten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Neu starten</button>
+    <button class="tbtn" id="modBtn" data-act="mod" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6M10 2h4M12 9v4l2 2"/><circle cx="12" cy="13" r="8"/></svg>Testmodus</button>
+  </div>
+</header>
+
+<main class="stage" id="stage">
+  <section class="scene" aria-live="polite">
+    <div class="scene-card">
+      <div class="scene-meta"><span class="clock" id="scClock">17.04</span><span class="place" id="scPlace"></span><span class="vtag" id="scVar">Mit Plan B</span></div>
+      <div class="linemap" id="lineMap"></div>
+      <div class="dots" id="scDots"></div>
+      <h2 id="scTitle"></h2>
+      <p id="scText"></p>
+      <p class="thought" id="scThought"></p>
+      <div class="durchsage" id="scDurch" hidden>
+        <button data-act="speak" aria-label="Durchsage abspielen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+        <div><span class="lbl">Durchsage im Zug</span><span id="scDurchText"></span></div>
+      </div>
+      <div class="board" id="scBoard" hidden></div>
+      <p class="hint" id="scHint"></p>
+      <div class="scene-actions" id="scActions"></div>
+    </div>
+    <details class="about">
+      <summary>So funktioniert der Prototyp</summary>
+      <ul>
+        <li>Links läuft die Szene aus unserem Storyboard. Mit dem grünen Knopf geht die Zeit weiter.</li>
+        <li>In der Mitte bedienst du das Handy von Matthi wie eine echte App.</li>
+        <li>Oben wechselst du zwischen <b>Heute</b> (App ohne Plan B) und <b>Mit Plan B</b>.</li>
+        <li><b>Testmodus</b> öffnet das Moderations-Skript mit Zeitmessung, Bewertungen und Auswertung.</li>
+      </ul>
+      <p>Schulprojekt ÜK 368 von Nico Luginbühl und Enea Perucchini. Fahrplan, Orte und Personen sind erfunden. Kein Produkt der SBB.</p>
+    </details>
+  </section>
+
+  <section class="device-wrap" aria-label="Smartphone von Matthi">
+    <div class="phone" id="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="screen" id="screen">
+        <div class="sbar"><span id="sbTime" class="num">17.04</span><span class="ic"><svg viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg><svg viewBox="0 0 26 12" fill="none" stroke="currentColor"><rect x=".5" y=".5" width="22" height="11" rx="3"/><rect x="2.5" y="2.5" width="14" height="7" rx="1.5" fill="currentColor" stroke="none"/><path d="M24.5 4v4" stroke-linecap="round"/></svg></span></div>
+        <div class="view" id="view"></div>
+        <div id="sheetHost"></div>
+        <div id="toastHost"></div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="mod" id="mod" hidden aria-label="Moderation">
+    <div class="mod-head">
+      <strong>Testmodus</strong>
+      <div class="seg" role="group" aria-label="Bereich">
+        <button data-act="modtab" data-t="test" id="mtTest" aria-pressed="true">Test</button>
+        <button data-act="modtab" data-t="eval" id="mtEval" aria-pressed="false">Auswertung</button>
+      </div>
+    </div>
+    <div class="mod-body" id="modBody"></div>
+  </aside>
+</main>
+
+<footer class="foot">Plan B · Schulprojekt ÜK 368 · Nico Luginbühl, Enea Perucchini · Fahrplan, Orte und Personen fiktiv · kein Produkt der SBB</footer>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= Grundlagen ================= */
+const T = (h, m) => h * 60 + m;
+const hm = m => String(Math.floor(m / 60)).padStart(2, '0') + '.' + String(m % 60).padStart(2, '0');
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KITA_CLOSE = T(18, 15), PLANNED_KITA = T(17, 52), WALK = 5;
+
+const sv = (p, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${p}</svg>`;
+const I = {
+  back: sv('<path d="M15 18l-6-6 6-6"/>'),
+  chev: sv('<path d="M9 18l6-6-6-6"/>'),
+  share: sv('<path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>'),
+  check: sv('<path d="M20 6 9 17l-5-5"/>'),
+  x: sv('<path d="M18 6 6 18M6 6l12 12"/>'),
+  info: sv('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+  train: sv('<rect x="5" y="3" width="14" height="13" rx="3"/><path d="M5 10h14M8 20l-1.5 2M16 20l1.5 2M8.5 13.5h.01M15.5 13.5h.01"/>'),
+  bus: sv('<rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M7 18v3M17 18v3M8 14.5h.01M16 14.5h.01"/>'),
+  walk: sv('<circle cx="13" cy="4" r="2"/><path d="M10 22l2-7-3-3 1-5 4 3 3 1M9 12l-2 3"/>'),
+  person: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/></svg>',
+  ticket: sv('<path d="M3 8a2 2 0 0 0 0 4v5h18v-5a2 2 0 0 1 0-4V4H3z" transform="translate(0 1)"/><path d="M14 5v14" stroke-dasharray="2 2"/>'),
+  search: sv('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+  route: sv('<circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H16a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h7.5"/>'),
+  menu: sv('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+  lock: sv('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  torch: sv('<path d="M8 2h8l-1 6H9z"/><path d="M9 8h6v12a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>'),
+  cam: sv('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
+  leaf: sv('<path d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"/><path d="M5 19 13 11"/>'),
+  sound: sv('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>'),
+  mute: sv('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/>'),
+  globe: sv('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),
+  play: sv('<path d="M7 4v16l13-8z"/>'),
+  next: sv('<path d="M5 12h14M13 6l6 6-6 6"/>'),
+  bell: sv('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>')
+};
+const occ = n => `<span class="occ" aria-label="Belegung ${['','wenig','mittel','stark'][n]}">${[1,2,3].map(i => `<span class="${i<=n?'':'off'}">${I.person}</span>`).join('')}</span>`;
+const modeIcon = m => m === 'Bus' || m === 'Postauto' ? I.bus : I.train;
+
+/* ================= Fahrplan (fiktiv, wie in Element b) ================= */
+const ROUTES = {
+  planb: { id:'planb', name:'S-Bahn + Bus über Au', dep:T(17,40), arr:T(18,4), ticket:'ok', where:'Gleis 4 · Sektor B', target:'g4', transfer:'4 Min.',
+    legs:[{dep:'17.40',arr:'17.46',mode:'S-Bahn',dir:'Richtung Au',from:'Brugg AG',to:'Au',plat:'Gleis 4 · Sektor B',occ:1},
+          {dep:'17.50',arr:'18.04',mode:'Bus',dir:'Richtung Lindenberg',from:'Au, Bahnhof',to:'Lindenberg, Dorf',plat:'Kante A',occ:1}] },
+  post1732: { id:'post1732', name:'Postauto direkt', dep:T(17,32), arr:T(17,47), ticket:'ok', where:'Bus-Kante C', target:'busC', risky:true,
+    legs:[{dep:'17.32',arr:'17.47',mode:'Postauto',dir:'Richtung Lindenberg',from:'Brugg AG, Bahnhof',to:'Lindenberg, Dorf',plat:'Kante C',occ:2}] },
+  birrhard: { id:'birrhard', name:'Bus über Birrhard', dep:T(17,43), arr:T(18,3), ticket:'extra', price:'4.40', where:'Bus-Kante D', target:'busD', transfer:'7 Min.',
+    legs:[{dep:'17.43',arr:'17.51',mode:'Bus',dir:'Richtung Birrhard',from:'Brugg AG, Bahnhof',to:'Birrhard, Post',plat:'Kante D',occ:2},
+          {dep:'17.53',arr:'18.03',mode:'Bus',dir:'Richtung Lindenberg',from:'Birrhard, Post',to:'Lindenberg, Dorf',plat:'Kante B',occ:1}] },
+  post1802: { id:'post1802', name:'Nächstes Postauto', dep:T(18,2), arr:T(18,17), ticket:'ok', where:'Bus-Kante C', target:'busC', transfer:'26 Min.',
+    legs:[{dep:'18.02',arr:'18.17',mode:'Postauto',dir:'Richtung Lindenberg',from:'Brugg AG, Bahnhof',to:'Lindenberg, Dorf',plat:'Kante C',occ:1}] }
+};
+const ALT_ORDER = ['planb','post1732','birrhard','post1802'];
+const DEFAULT_MSG = 'Hallo, ich bin wegen einer Zugverspätung etwas später, ca. 18.09 bei euch. Matthi';
+
+/* ================= Zustand ================= */
+const S = {
+  variant:'planb', step:'start', sim:T(17,4), screen:'trip', hist:[], sheet:null,
+  chosen:null, shared:false, rcpt:null, msg:DEFAULT_MSG, live:true, replied:false,
+  compAuto:true, compSent:false, from:'Brugg AG', to:'', conn:null, sound:true, toast:null
+};
+let toastTimer = null, clockAnim = null;
+
+function resetScenario(variant){
+  Object.assign(S, { variant: variant || S.variant, step:'start', sim:T(17,4), screen:'trip', hist:[], sheet:null,
+    chosen:null, shared:false, rcpt:null, msg:DEFAULT_MSG, live:true, replied:false, compAuto:true, compSent:false,
+    from:'Brugg AG', to:'', conn:null, toast:null });
+}
+
+/* Welche Verbindung faehrt Matthi am Ende wirklich? */
+function finalRoute(){
+  const c = S.chosen || 'post1732';
+  if (c === 'post1732') return S.variant === 'planb' ? { ...ROUTES.planb, switched:true } : { ...ROUTES.post1802, missed:true };
+  return ROUTES[c];
+}
+const kitaTime = r => r.arr + WALK;
+
+/* ================= Szenen (Storyboard Element b) ================= */
+const STEPS = ['start','stopped','push','decide','decided','brugg','kita','evening'];
+const STEP_TIME = { start:T(17,4), stopped:T(17,12), push:T(17,16), decide:T(17,17), decided:T(17,18), brugg:T(17,36), kita:null, evening:T(20,30) };
+
+function outcomeHeute(){
+  const c = S.chosen;
+  if (c === 'post1732') return { text:'Du setzt auf das Postauto 17.32. Der IR kommt um 17.36 in Brugg an, das Postauto ist weg. Das nächste fährt um 18.02. Du bist um 18.22 bei der Kita, 7 Minuten nach Schluss.', thought:'Ich hätte es wissen müssen.', tense:true };
+  if (c === 'planb') return { text:'Du hast die S-Bahn 17.40 und den Bus ab Au gefunden. Bei der Kita bist du um 18.09. Ob dein Abo auf diesem Weg gilt, hat dir die App nicht gesagt.', thought:'Geschafft, aber das war knapp.', tense:false };
+  if (c === 'birrhard') return { text:'Du nimmst den Bus über Birrhard. Dein Verbundabo gilt dort nicht. Die App hat dich nicht gewarnt. Ohne Zusatzbillett riskierst du eine Busse.', thought:'Gilt mein Abo hier überhaupt?', tense:true };
+  if (c === 'post1802') return { text:'Du wartest auf das Postauto 18.02. Bei der Kita bist du um 18.22, 7 Minuten nach Schluss.', thought:'Die halten mich für unzuverlässig.', tense:true };
+  return { text:'', thought:'' };
+}
+
+function scene(){
+  const pb = S.variant === 'planb', r = finalRoute();
+  switch (S.step){
+    case 'start': return { place:'Zürich HB · Gleis 13', title:'Feierabend, alles im Plan',
+      text:'Du bist Matthi Brunner. Du steigst in den Interregio nach Brugg und nimmst dort das Postauto 17.32 nach Lindenberg. Die Kita von Noah schliesst um 18.15.',
+      thought:'Noch gut 70 Minuten bis Kita-Schluss. Passt.', next:{label:'Losfahren', to:'stopped'} };
+    case 'stopped': return { place:'Zwischen Zürich und Brugg', title:'Der Zug steht',
+      text:'Euer Zug hält vor einem roten Signal. Die anderen Reisenden schauen auf die Uhr. Dein Handy ist in der Tasche.',
+      thought:'Oh nein. Nicht heute.', tense:true, next:{label:'Weiter warten', to:'push'} };
+    case 'push': return { place:'Zwischen Zürich und Brugg', title: pb ? 'Plan B meldet sich' : 'Die App meldet sich',
+      text:'Dein Handy vibriert.', hint:'Tippe auf die Mitteilung.' };
+    case 'decide': return { place:'IR · ca. 6 Min. Verspätung', title:'Was machst du jetzt?',
+      text: pb ? 'Plan B zeigt dir, wie es um deinen Anschluss steht, und hat schon eine Alternative bereit.' : 'Dein Zug hat Verspätung. Ob das Postauto in Brugg wartet, weisst du nicht.',
+      hint:'Entscheide, wie du nach Lindenberg fährst.' };
+    case 'decided':
+      if (!pb){ const o = outcomeHeute(); return { place:'So endet der Abend heute', title:'Ohne Plan B', text:o.text, thought:o.thought, tense:o.tense,
+        next:{label:'Gleiche Situation mit Plan B', act:'toPlanB'} }; }
+      return { place:'IR · fährt wieder', title: S.chosen === 'planb' ? 'Plan B ist aktiv' : 'Entscheid gespeichert',
+        text: S.chosen === 'planb' ? 'Der Zug fährt wieder. Bis Brugg musst du nichts tun. Plan B meldet sich, wenn sich etwas ändert.' : 'Der Zug fährt wieder. Plan B behält deinen Anschluss im Auge.',
+        thought: S.chosen === 'planb' ? 'Lieber sicher. So schaffe ich die Kita.' : '', hint: S.shared ? '' : 'Tipp: Gib der Kita Bescheid.',
+        next:{label:'Weiterfahren bis Brugg', to:'brugg'} };
+    case 'brugg': {
+      const wait = r.id === 'post1802';
+      return { place:'Brugg AG · Gleis 1', title: wait ? 'Warten in Brugg' : 'Umsteigen ohne Rennen',
+        text: r.switched ? 'Der IR kommt 8 Minuten zu spät an. Das Postauto 17.32 ist weg. Plan B hat schon umgestellt.' : 'Der IR kommt 8 Minuten zu spät an. Das Postauto 17.32 ist weg.' + (wait ? ' Du wartest auf das nächste.' : ' Du weisst schon, wohin.'),
+        durch: 'Reisende nach Lindenberg: Bitte nehmen Sie die S-Bahn auf Gleis 4 und ab Au den Bus.', board:true,
+        thought: wait ? 'Das wird knapp mit der Kita.' : 'Ich muss nicht rennen.', tense: wait,
+        next:{label:'Umsteigen und weiterfahren', to:'kita'} };
+    }
+    case 'kita': {
+      const k = kitaTime(r), late = k > KITA_CLOSE;
+      return { place:'Kita Lindenberg', title: late ? 'Zu spät' : 'Rechtzeitig da',
+        text: late ? `Du bist um ${hm(k)} bei der Kita, ${k-KITA_CLOSE} Minuten nach Schluss. Eine Betreuerin wartet mit Noah.` : `Noah rennt dir an der Tür entgegen. Du bist um ${hm(k)} da, ${KITA_CLOSE-k} Minuten vor Kita-Schluss.`,
+        thought: late ? 'Das ist mir peinlich.' : '«Papi!»', tense: late, next:{label:'Später am Abend', to:'evening'} };
+    }
+    case 'evening': return { place:'Zuhause', title:'Abends auf dem Sofa',
+      text:'Die App zeigt dir die Bilanz des Tages. Vom Montag ist noch eine Fahrt mit grosser Verspätung offen.',
+      hint:'Schau dir die offene Entschädigung vom Montag an.', next:{label:'Nochmals von vorne', act:'restart'} };
+  }
+  return {};
+}
+
+/* ================= Linienskizze ================= */
+function lineMap(){
+  const st = S.step, pb = S.variant === 'planb', r = finalRoute(), i = STEPS.indexOf(st);
+  const Y = 44, ZH = 24, BR = 160, LB = 314, AU = [237, 124];
+  const postGone = i >= 5, lateLine = r.id === 'post1802' && i >= 4;
+  const showAlt = (pb && i >= 3) || (S.chosen && S.chosen !== 'post1732' && S.chosen !== 'post1802' && i >= 4);
+  const altActive = !!S.chosen && i >= 4 && (r.id === 'planb' || r.id === 'birrhard');
+  const warnPost = pb && i >= 2 && i <= 4 && !lateLine;
+  const via = r.id === 'birrhard' ? 'Birrhard' : 'Au';
+  const pos = i === 0 ? [ZH, Y] : (i <= 4 ? [95, Y] : (i === 5 ? [BR, Y] : [LB, Y]));
+  const postColor = lateLine ? 'var(--warn)' : (postGone ? 'var(--muted)' : (warnPost ? 'var(--warn)' : 'var(--map-ink)'));
+  let postLabel;
+  if (lateLine) postLabel = ['Postauto 18.02', 'Kita zu spät'];
+  else if (postGone) postLabel = ['Postauto 17.32', 'weg'];
+  else if (warnPost) postLabel = ['Postauto 17.32', 'wartet bis 17.34'];
+  else postLabel = ['Postauto 17.32', ''];
+  const lblCls = postGone && !lateLine ? 'lm-small lm-bad' : (warnPost || lateLine ? 'lm-small lm-warn' : 'lm-small');
+  return `<svg viewBox="0 0 340 146" role="img" aria-label="Streckenskizze Zürich HB, Brugg, Lindenberg">
+    <line x1="${ZH}" y1="${Y}" x2="${BR}" y2="${Y}" stroke="var(--map-ink)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="${BR}" y1="${Y}" x2="${LB}" y2="${Y}" stroke="${postColor}" stroke-width="${postGone && !lateLine ? 2.5 : 4}" ${postGone || warnPost || lateLine ? 'stroke-dasharray="6 6"' : ''} stroke-linecap="round"/>
+    ${showAlt ? `<path d="M${BR} ${Y} L${AU[0]} ${AU[1]} L${LB} ${Y}" fill="none" stroke="var(--accent)" stroke-opacity="${altActive ? 1 : .55}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" ${altActive ? '' : 'stroke-dasharray="5 6"'}/>
+      <circle cx="${AU[0]}" cy="${AU[1]}" r="6.5" fill="var(--surface)" stroke="var(--accent)" stroke-width="3"/>
+      <text x="${AU[0]}" y="${AU[1] + 19}" text-anchor="middle" class="lm-text">${via}</text>
+      <text x="200" y="98" text-anchor="end" class="lm-small lm-green">${r.id === 'birrhard' ? 'Bus 17.43' : 'S-Bahn 17.40'}</text>
+      <text x="275" y="98" class="lm-small lm-green">${r.id === 'birrhard' ? 'Bus 17.53' : 'Bus 17.50'}</text>` : ''}
+    ${postGone && !lateLine ? `<g transform="translate(${AU[0]} ${Y})" stroke="var(--bad)" stroke-width="3" stroke-linecap="round"><path d="M-6 -6 6 6M6 -6 -6 6"/></g>` : ''}
+    <text x="${AU[0]}" y="62" text-anchor="middle" class="${lblCls}">${postLabel[0]}</text>
+    ${postLabel[1] ? `<text x="${AU[0]}" y="74" text-anchor="middle" class="${lblCls}">${postLabel[1]}</text>` : ''}
+    <text x="92" y="62" text-anchor="middle" class="lm-small ${i >= 1 ? 'lm-warn' : ''}">${i >= 1 ? `IR ca. ${i >= 5 ? 8 : 6} Min. später` : 'IR 17.04'}</text>
+    ${[[ZH,'Zürich HB','start',-8],[BR,'Brugg','middle',0],[LB,'Lindenberg','end',8]].map(([x,l,a,dx]) => `<circle cx="${x}" cy="${Y}" r="6.5" fill="var(--surface)" stroke="var(--map-ink)" stroke-width="3"/><text x="${x + dx}" y="${Y - 16}" text-anchor="${a}" class="lm-text">${l}</text>`).join('')}
+    <g transform="translate(${pos[0]} ${pos[1]})"><circle r="10" fill="var(--accent)" opacity=".25"/><circle r="5.5" fill="var(--accent)"/></g>
+  </svg>`;
+}
+
+/* ================= Telefon: Bausteine ================= */
+const appbar = (title, { back = null, right = '' } = {}) =>
+  `<div class="appbar">${back ? `<button class="ib" data-act="${back}" aria-label="Zurück">${I.back}</button>` : '<span></span>'}<div class="t">${title}</div>${right || '<span></span>'}</div>`;
+const tabbar = active => `<nav class="tabbar">${[['search','Fahrplan',I.search],['trip','Reisebegleiter',I.route],['tickets','Billette',I.ticket],['more','Mehr',I.menu]]
+  .map(([k,l,ic]) => `<button data-act="tab" data-tab="${k}" class="${k===active?'on':''}">${ic}<span>${l}</span></button>`).join('')}</nav>`;
+
+function tlRows(rows, cls = ''){
+  return `<ol class="tl ${cls}">${rows.map((r, i) => {
+    const c = [r.kind || '', i === 0 ? 'first' : '', i === rows.length - 1 ? 'last' : ''].join(' ');
+    if (r.kind === 'leg') return `<li class="${c}"><div></div><div class="rail"><i></i></div><div class="bd"><span class="mode">${modeIcon(r.mode)}${r.mode}</span> <span class="sb">${r.dir}${r.occ ? occ(r.occ) : ''}</span></div></li>`;
+    if (r.kind === 'walk') return `<li class="${c}"><div></div><div class="rail"><i></i></div><div class="bd"><span class="sb">${r.text}</span></div></li>`;
+    return `<li class="${c}"><div class="tm">${r.old ? `<s>${r.old}</s>` : ''}${r.time}${r.delay ? `<span class="dl">${r.delay}</span>` : ''}</div><div class="rail"><i></i></div><div class="bd"><div class="st">${r.stop}</div>${r.sub ? `<div class="sb">${r.sub}</div>` : ''}</div></li>`;
+  }).join('')}</ol>`;
+}
+function irRows(delay){
+  return [
+    { time:'17.04', stop:'Zürich HB', sub:'Gleis 13' },
+    { kind:'leg', mode:'IR', dir:'Interregio Richtung Brugg', occ:2 },
+    delay ? { old:'17.28', time:'ca. 17.34', delay:'+6', stop:'Brugg AG', sub:'an Gleis 1' } : { time:'17.28', stop:'Brugg AG', sub:'an Gleis 1' }
+  ];
+}
+function routeRows(r){
+  const rows = [];
+  r.legs.forEach((l, i) => {
+    if (i > 0) rows.push({ kind:'walk', text:`Umsteigen · ${r.id === 'birrhard' ? '2' : '4'} Min.` });
+    rows.push({ time:l.dep, stop:l.from, sub:l.plat });
+    rows.push({ kind:'leg', mode:l.mode, dir:l.dir, occ:l.occ });
+    if (i === r.legs.length - 1) rows.push({ time:l.arr, stop:l.to, sub: ticketLine(r, true) });
+    else rows.push({ time:l.arr, stop:l.to, sub:'' });
+  });
+  return rows;
+}
+function ticketLine(r, plain){
+  if (S.variant !== 'planb') return '';
+  if (r.ticket === 'ok') return plain ? '<span style="color:var(--p-green-ink);font-weight:700">Dein Verbundabo gilt</span>' : `<div class="ticket ok">${I.check}Dein Verbundabo gilt</div>`;
+  return plain ? `<span style="color:var(--p-red-ink);font-weight:700">Abo gilt nicht · Zusatzbillett CHF ${r.price}</span>` : `<div class="ticket bad">${I.x}Dein Abo gilt hier nicht. Zusatzbillett nötig: CHF ${r.price}</div>`;
+}
+
+/* ================= Telefon: Bildschirme ================= */
+function vLock(){
+  const pb = S.variant === 'planb', push = S.step === 'push';
+  let html = `<div class="lock"><div class="lock-top"><div class="lock-date">Dienstag</div><div class="lock-time">${hm(S.sim)}</div></div><div class="lock-stack">`;
+  if (pb){
+    html += push
+      ? `<div class="la" aria-label="Live-Aktivität"><div class="la-h"><span class="b">B</span>Plan B · Anschluss Brugg<span class="st"><i></i>wackelt</span></div>
+          <div class="la-row"><span>Ankunft Brugg<br><strong>ca. 17.34</strong></span><span style="text-align:right">Postauto wartet bis<br><strong>17.34</strong></span></div>
+          <div class="la-bar"><b></b></div>
+          <div class="la-plan">${I.leaf}Plan B bereit: S-Bahn 17.40, Gleis 4</div></div>`
+      : `<div class="la" aria-label="Live-Aktivität"><div class="la-h"><span class="b">B</span>Plan B · Anschluss Brugg<span class="st neutral"><i></i>Zug steht</span></div>
+          <div class="la-row"><span>Ankunft Brugg<br><strong>17.28</strong></span><span style="text-align:right">Postauto<br><strong>17.32</strong></span></div>
+          <div class="la-bar neutral"><b></b></div>
+          <div class="la-plan" style="color:#C9D4E3">${I.info}Plan B prüft deinen Anschluss</div></div>`;
+  }
+  if (push){
+    html += pb
+      ? `<button class="notif" data-act="pushOpen"><span class="notif-h"><span class="b">B</span><span>REISEBEGLEITER · PLAN B</span><span>jetzt</span></span>
+          <strong><span class="dotw"></span>Anschluss in Brugg wackelt</strong>
+          <span class="np">Ankunft ca. 17.34 statt 17.28. Dein Postauto 17.32 wartet höchstens bis 17.34.</span><span class="nact">Plan B ansehen</span></button>`
+      : `<button class="notif" data-act="pushOpen"><span class="notif-h"><span class="b grey">${I.train}</span><span>REISEBEGLEITER</span><span>jetzt</span></span>
+          <strong>Verspätung</strong><span class="np">IR 17.04 Zürich HB – Brugg AG: ca. 6 Min. später. Ankunft Brugg ca. 17.34.</span></button>`;
+  }
+  html += `</div>`;
+  if (!push) html += `<div class="wake">Matthis Handy ist in der Tasche.</div>`;
+  html += `<div class="lock-bottom"><span class="lk">${I.torch}</span><span class="lk-hint">${push ? 'Mitteilung antippen' : ''}</span><span class="lk">${I.cam}</span></div></div>`;
+  return html;
+}
+
+function vTrip(){
+  const pb = S.variant === 'planb', i = STEPS.indexOf(S.step);
+  const shareBtn = pb && S.chosen ? `<button class="ib" data-act="share" aria-label="Ankunft teilen">${I.share}</button>` : '';
+  let h = appbar('Reisebegleiter', { right: shareBtn }) + '<div class="pad">';
+  h += `<div><div class="route-h">Zürich HB <span class="arr">→</span> Lindenberg</div><div class="muted small">Dienstag · deine Pendelstrecke</div></div>`;
+  if (pb) h += `<div class="chips"><span class="chip">${I.bell}Fixtermin 18.15 · Kita</span><span class="chip">${I.ticket}Streckenabo + Verbundabo</span></div>`;
+
+  if (i <= 1){ // vor der Verspaetung
+    if (pb) h += `<div><span class="pill ok">Anschluss sicher · 4 Min. Umsteigezeit in Brugg</span></div>`;
+    h += `<div class="card">${tlRows([...irRows(false), { kind:'walk', text:'Umsteigen · 4 Min.' }, { time:'17.32', stop:'Brugg AG, Bahnhof', sub:'Kante C' }, { kind:'leg', mode:'Postauto', dir:'Richtung Lindenberg', occ:2 }, { time:'17.47', stop:'Lindenberg, Dorf', sub:'' }])}</div>`;
+    h += `</div>` + tabbar('trip');
+    return h;
+  }
+
+  if (!S.chosen){ // Entscheid offen
+    if (pb){
+      const r = ROUTES.planb;
+      h += `<div class="alert warn"><h3><span class="dotw"></span>Anschluss wackelt</h3>
+        <p>Dein Zug kommt ca. <b>17.34</b> in Brugg an (+6 Min.).<br>Das Postauto 17.32 wartet höchstens bis <b>17.34</b>.</p>
+        <p class="small">Das reicht nur, wenn dein Zug keine Minute mehr verliert.</p></div>
+        <div class="planb"><div class="planb-h">Dein Plan B<small>empfohlen</small></div><div class="planb-b">
+          ${tlRows(routeRows(r), 'green')}
+          <div class="ticket ok">${I.check}Dein Verbundabo gilt auf diesem Weg</div>
+          <div class="calm">${I.bell}<span>Bei der Kita ca. <b>18.09</b>, 6 Min. vor deinem Fixtermin.</span></div>
+          <button class="pbtn" data-act="choose" data-id="planb">Plan B übernehmen</button></div></div>
+        <button class="link" data-act="alts">Andere Verbindungen (3) ${I.chev}</button>
+        <p class="muted small" style="margin:0">Wenn das Postauto nicht wartet: nächstes um 18.02, an 18.17.<br>Prognose aus Echtzeitdaten · aktualisiert 17.16</p>`;
+    } else {
+      h += `<div class="card">${tlRows([...irRows(true), { kind:'walk', text:'Umsteigen · 4 Min.' }, { time:'17.32', stop:'Brugg AG, Bahnhof', sub:'Kante C' }, { kind:'leg', mode:'Postauto', dir:'Richtung Lindenberg', occ:2 }, { time:'17.47', stop:'Lindenberg, Dorf', sub:'' }])}</div>
+        <button class="pbtn line" data-act="tab" data-tab="search">${I.search}Verbindung suchen</button>`;
+    }
+    h += `</div>` + tabbar('trip');
+    return h;
+  }
+
+  // Entscheid getroffen
+  const r = ROUTES[S.chosen];
+  if (pb){
+    const k = kitaTime(r);
+    if (S.chosen === 'post1732') h += `<div class="alert warn"><h3><span class="dotw"></span>Du setzt auf das Postauto</h3><p>Es wartet höchstens bis 17.34. Plan B bleibt bereit und stellt um, falls es nicht klappt.</p></div>`;
+    else h += `<div><span class="pill ${k > KITA_CLOSE ? 'warn' : 'ok'}">${S.chosen === 'planb' ? 'Plan B aktiv' : 'Neue Verbindung'} · an Lindenberg ${hm(r.arr)}</span></div>
+      <div class="calm">${I.leaf}<span>Bis Brugg musst du nichts tun. Wir melden uns, wenn sich etwas ändert.</span></div>`;
+    h += `<div class="card">${tlRows([...irRows(true), { kind:'walk', text:`Umsteigen in Brugg → <b>${r.where}</b>` }, ...routeRows(r)], S.chosen === 'post1732' ? '' : 'green')}</div>`;
+    if (r.ticket === 'extra') h += `<div class="alert bad">${ticketLine(r)}<button class="pbtn dark" data-act="toastMsg" data-msg="Im Prototyp nicht enthalten: Zusatzbillett kaufen">Zusatzbillett kaufen · CHF ${r.price}</button></div>`;
+    h += S.shared
+      ? `<div class="saved">${I.check}Kita informiert um 17.18${S.live ? ' · Live-Link aktiv' : ''}</div>`
+      : `<div class="card" style="display:flex;flex-direction:column;gap:8px"><b>Kita Bescheid geben?</b><span class="muted small">Neue Ankunft bei der Kita ca. ${hm(k)}. Mit einem Tipp verschickt.</span><button class="pbtn" data-act="share">${I.share}Ankunft teilen</button></div>`;
+    h += `<button class="link" data-act="alts">Andere Verbindungen ${I.chev}</button>`;
+  } else {
+    h += `<div><span class="pill neutral">Verbindung gespeichert</span></div>
+      <div class="card">${tlRows([...irRows(true), { kind:'walk', text:'Umsteigen in Brugg' }, ...routeRows(r)])}</div>`;
+  }
+  h += `</div>` + tabbar('trip');
+  return h;
+}
+
+function vAlts(){
+  let h = appbar('Andere Verbindungen', { back:'back' }) + `<div class="pad">
+    <div class="muted small">Ab Brugg AG nach Lindenberg. Sortiert nach: sicher und rechtzeitig ankommen. Plan B bevorzugt Verbindungen, auf denen dein Billett gilt.</div>`;
+  ALT_ORDER.forEach(id => {
+    const r = ROUTES[id], k = kitaTime(r), chosen = S.chosen === id;
+    const status = id === 'post1732' ? `<span class="pill warn">wartet bis 17.34 · unsicher</span>`
+      : (k > KITA_CLOSE ? `<span class="pill bad">Kita ca. ${hm(k)} · ${k - KITA_CLOSE} Min. nach Fixtermin</span>` : `<span class="pill ok">Kita ca. ${hm(k)} · ${KITA_CLOSE - k} Min. Reserve</span>`);
+    h += `<div class="alt ${id === 'planb' ? 'rec' : ''}" data-alt="${id}">
+      <div class="alt-top"><b>${hm(r.dep)} → ${hm(r.arr)}</b>${id === 'planb' ? '<span class="tag">Plan B</span>' : `<span class="muted small">${r.legs.length === 1 ? 'direkt' : (r.legs.length - 1) + ' Umstieg'}</span>`}</div>
+      <div class="chips">${r.legs.map(l => `<span class="chip">${modeIcon(l.mode)}${l.mode}</span>`).join('')}<span class="chip">${r.where}</span></div>
+      ${status}
+      ${ticketLine(r)}
+      ${chosen ? `<button class="pbtn line" disabled>Gewählt</button>` : `<button class="pbtn ${id === 'planb' ? '' : 'line'}" data-act="choose" data-id="${id}">${r.ticket === 'extra' ? 'Mit Zusatzbillett nehmen' : (id === 'planb' ? 'Plan B übernehmen' : 'Diese Verbindung nehmen')}</button>`}
+    </div>`;
+  });
+  return h + `</div>`;
+}
+
+function vSearch(){
+  const recent = `<div class="field"><label>Letzte Suchen</label><div class="sugg">
+    <button data-act="recent" data-f="Brugg AG" data-t="Lindenberg, Dorf">Brugg AG → Lindenberg, Dorf</button>
+    <button data-act="recent" data-f="Zürich HB" data-t="Brugg AG">Zürich HB → Brugg AG</button></div></div>`;
+  return appbar('Fahrplan', { back: S.hist.length ? 'back' : null }) + `<div class="pad">
+    <div class="field"><label for="inFrom">Von</label><input id="inFrom" type="text" value="${esc(S.from)}" autocomplete="off" data-in="from"></div>
+    <div class="field"><label for="inTo">Nach</label><input id="inTo" type="text" value="${esc(S.to)}" placeholder="Haltestelle, Ort" autocomplete="off" data-in="to"></div>
+    <div id="toSugg"></div>
+    <div class="chips"><span class="chip">Abfahrt · jetzt ${hm(S.sim)}</span></div>
+    <button class="pbtn dark" data-act="doSearch">${I.search}Verbindungen suchen</button>
+    ${recent}</div>` + tabbar('search');
+}
+function suggHtml(){
+  const v = S.to.trim().toLowerCase();
+  if (v.length < 2 || 'lindenberg, dorf'.startsWith(v) === false && !'lindenberg'.includes(v)) return '';
+  if (S.to === 'Lindenberg, Dorf') return '';
+  return `<div class="sugg"><button data-act="pickTo" data-v="Lindenberg, Dorf">Lindenberg, Dorf</button><button data-act="pickTo" data-v="Lindenberg, Schulhaus">Lindenberg, Schulhaus</button></div>`;
+}
+function vResults(){
+  const pb = S.variant === 'planb';
+  let h = appbar('Verbindungen', { back:'back' }) + `<div class="pad"><div><div class="route-h" style="font-size:16px">Brugg AG <span class="arr">→</span> Lindenberg</div><div class="muted small">Dienstag · ab ${hm(S.sim)}</div></div>`;
+  ['post1732','planb','birrhard','post1802'].forEach(id => {
+    const r = ROUTES[id], dur = r.arr - r.dep, n = r.legs.length - 1;
+    h += `<button class="res" data-act="conn" data-id="${id}"><div class="res-top"><b>${hm(r.dep)} → ${hm(r.arr)}</b><span class="muted small">${dur} Min.</span></div>
+      <div class="res-mid">${r.legs.map(l => `<span class="chip">${modeIcon(l.mode)}${l.mode}</span>`).join('')}<span>${n ? n + ' Umstieg' : 'direkt'}</span><span>· ab ${r.legs[0].plat}</span></div>
+      ${pb ? ticketLine(r) : ''}</button>`;
+  });
+  return h + `</div>` + tabbar('search');
+}
+function vConn(){
+  const r = ROUTES[S.conn], pb = S.variant === 'planb';
+  return appbar('Verbindung', { back:'back' }) + `<div class="pad">
+    <div class="alt-top"><b style="font-size:20px">${hm(r.dep)} → ${hm(r.arr)}</b><span class="muted small">${r.arr - r.dep} Min.</span></div>
+    <div class="card">${tlRows(routeRows(r))}</div>
+    ${pb ? ticketLine(r) : ''}
+    <button class="pbtn" data-act="choose" data-id="${r.id}">${pb ? 'Diese Verbindung nehmen' : 'Zum Reisebegleiter hinzufügen'}</button></div>`;
+}
+
+function mapSvg(target){
+  const toG4 = target === 'g4';
+  const end = toG4 ? [118,115] : (target === 'busD' ? [250,166] : [196,166]);
+  const path = toG4 ? 'M58 30 L82 30 L82 92 L118 92 L118 115' : `M58 30 L82 30 L82 150 L${end[0]} 150 L${end[0]} ${end[1]}`;
+  return `<svg viewBox="0 0 300 186" role="img" aria-label="Plan Bahnhof Brugg mit Weg zum Ziel">
+    <rect x="10" y="20" width="280" height="20" rx="5" fill="#E9E5DC"/><text x="16" y="15" class="mp-t">Gleis 1 · hier kommst du an</text>
+    ${['A','B','C','D'].map((s,i) => `<text x="${26+i*68}" y="34" class="mp-s">${s}</text>`).join('')}
+    <rect x="10" y="56" width="280" height="14" rx="5" fill="#EFECE5"/><text x="16" y="66" class="mp-s">Gleis 2 / 3</text>
+    <rect x="10" y="104" width="280" height="22" rx="5" fill="${toG4 ? '#D7EEDF' : '#EFECE5'}"/><text x="16" y="140" class="mp-t">Gleis 4</text>
+    ${['A','B','C','D'].map((s,i) => `<text x="${26+i*68}" y="119" class="mp-s">${s}</text>`).join('')}
+    <rect x="74" y="20" width="16" height="140" rx="3" fill="#D9D4C9" opacity=".7"/><text x="96" y="84" class="mp-s">Unterführung</text>
+    <rect x="150" y="156" width="140" height="22" rx="5" fill="${toG4 ? '#EFECE5' : '#D7EEDF'}"/><text x="156" y="184" class="mp-s">Bahnhofplatz · Bus</text>
+    <text x="176" y="171" class="mp-s">C</text><text x="230" y="171" class="mp-s">D</text>
+    <path d="${path}" class="walkpath"/>
+    <circle cx="58" cy="30" r="7" fill="#1F2E44"/><text x="58" y="33.5" text-anchor="middle" style="font:800 8px var(--f-ui);fill:#fff">Du</text>
+    <circle cx="${end[0]}" cy="${end[1]}" r="8" fill="#2E9E6A"/><path d="M${end[0]-3.5} ${end[1]} l2.5 2.5 l4.5 -5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+function vTransfer(){
+  const r = finalRoute(), pb = S.variant === 'planb';
+  const wait = r.id === 'post1802';
+  const leg = r.legs[0];
+  const minutes = (r.dep - T(17,36));
+  let h = appbar('Umsteigen in Brugg') + `<div class="pad">`;
+  if (r.switched) h += `<div class="alert bad"><h3>${I.x}Postauto 17.32 ist weg</h3><p>Plan B hat für dich umgestellt. Du musst nichts tun.</p></div>`;
+  h += `<div><span class="pill ${wait ? 'warn' : 'ok'}">${wait ? `${minutes} Min. Wartezeit` : `Anschluss sicher · ${minutes} Min. bis Abfahrt`}</span></div>
+    <div><div class="big-where">${r.where}</div><div class="muted">${leg.mode} ${leg.dep} ${leg.dir}${pb ? occ(leg.occ) : ''}</div></div>
+    <div class="map">${mapSvg(r.target)}</div>
+    <ol class="steps">${r.target === 'g4'
+      ? '<li>Steig vorne aus, in Sektor A. Dort ist die Treppe.</li><li>Durch die Unterführung und rechts zu Gleis 4.</li><li>Warte in Sektor B. Dort ist die S-Bahn wenig besetzt.</li>'
+      : `<li>Steig vorne aus, in Sektor A. Dort ist die Treppe.</li><li>Durch die Unterführung zum Bahnhofplatz.</li><li>Geh zu Kante ${r.target === 'busD' ? 'D' : 'C'}.</li>`}</ol>
+    <div class="chips"><span class="chip">${I.walk}ca. 2 Min. zu Fuss</span><span class="chip">Lift vorhanden</span></div>`;
+  if (r.ticket === 'extra') h += ticketLine(r);
+  if (wait && pb) h += `<div class="alert warn"><p>Bei der Kita ca. ${hm(kitaTime(r))}, ${kitaTime(r) - KITA_CLOSE} Min. nach deinem Fixtermin.</p></div>`;
+  return h + `</div>`;
+}
+function vArrived(){
+  const r = finalRoute(), k = kitaTime(r), late = k > KITA_CLOSE, pb = S.variant === 'planb';
+  return appbar('Reisebegleiter') + `<div class="pad" style="text-align:center">
+    <div class="bigcheck" style="${late ? 'background:var(--p-amber)' : ''}">${I.check}</div>
+    <div class="route-h" style="justify-content:center">Angekommen in Lindenberg</div>
+    <div class="muted">an ${hm(r.arr)} · noch 5 Min. zu Fuss</div>
+    ${pb ? `<div class="alert ${late ? 'warn' : 'ok'}" style="text-align:left"><p>${late ? `Du bist ${k - KITA_CLOSE} Min. nach deinem Fixtermin bei der Kita.` : `Du bist ${KITA_CLOSE - k} Min. vor deinem Fixtermin (Kita 18.15) da.`}</p></div>` : ''}
+  </div>`;
+}
+function vSummary(){
+  const r = finalRoute(), k = kitaTime(r), late = k > KITA_CLOSE, delay = k - PLANNED_KITA, saved = T(18,22) - k;
+  return appbar('Deine Reise heute') + `<div class="pad">
+    <div class="hero"><div class="n">+${delay} Min.</div><div class="muted">später als geplant</div></div>
+    <div class="card">
+      <div class="kv"><span>Bei der Kita</span><span>${hm(k)} · ${late ? `${k - KITA_CLOSE} Min. zu spät` : `${KITA_CLOSE - k} Min. vor Schluss`}</span></div>
+      <div class="kv"><span>Ohne Plan B</span><span>ca. 18.22 (Postauto 18.02)</span></div>
+      <div class="kv"><span>Kita informiert</span><span>${S.shared ? '17.18' : 'nein'}</span></div>
+    </div>
+    ${saved > 0 ? `<div class="saved">${I.leaf}Plan B hat dir heute ${saved} Minuten gespart.</div>` : ''}
+    <div class="toggle"><span class="tx"><b>Entschädigungs-Check</b><span class="muted small">Prüft automatisch ab 60 Min. Verspätung. Heute: kein Anspruch.</span></span>
+      <button class="sw" role="switch" aria-checked="${S.compAuto}" data-act="compAuto" aria-label="Entschädigungs-Check"></button></div>
+    <div class="compcard" style="border:2px solid ${S.compSent ? 'var(--p-line)' : 'var(--p-amber)'}">
+      <span class="muted small">Offen · Fahrt vom Montag</span>
+      <b>Zürich HB → Lindenberg · 72 Min. Verspätung</b>
+      ${S.compSent ? `<div class="ticket ok">${I.check}Gesuch gesendet</div>` : `<span class="small">Du hast Anspruch auf eine Entschädigung. Das Gesuch ist schon ausgefüllt.</span><button class="pbtn" data-act="compOpen">Ansehen</button>`}
+    </div></div>` + tabbar('trip');
+}
+function vComp(){
+  return appbar('Entschädigung', { back:'back' }) + `<div class="pad">
+    <div class="compcard" style="background:#F6EFE2"><span class="muted small">Fahrt vom Montag</span><b>Zürich HB → Lindenberg</b><span class="pill warn" style="align-self:flex-start">72 Min. Verspätung am Ziel</span><span class="small">Du hast Anspruch auf eine Entschädigung.</span></div>
+    <ul class="checks"><li>${I.check}Reise erkannt (Reisebegleiter)</li><li>${I.check}Abo erkannt: Streckenabo Zürich HB – Brugg AG</li><li>${I.check}Bankkonto hinterlegt</li></ul>
+    <div class="card small"><div class="kv"><span>Betrag</span><span>Tageswert deines Abos,<br>mindestens CHF 5.–</span></div><div class="kv"><span>Berechnung</span><span>durch die Alliance SwissPass</span></div></div>
+    <div class="saved">${I.check}Das Gesuch ist ausgefüllt.</div>
+    <button class="pbtn" data-act="compReview">Prüfen und senden</button>
+    <p class="muted small" style="margin:0">Frist: 30 Tage nach der Reise. Wir erinnern dich daran.</p></div>`;
+}
+function vCompDone(){
+  return appbar('Entschädigung', { back:'back' }) + `<div class="pad" style="text-align:center">
+    <div class="bigcheck">${I.check}</div><div class="route-h" style="justify-content:center">Gesuch gesendet</div>
+    <p class="muted" style="margin:0">Die Auszahlung kommt in der Regel innert 30 Tagen auf dein Konto. Wir schicken dir eine Mitteilung.</p>
+    <button class="pbtn line" data-act="back">Zurück zur Übersicht</button></div>`;
+}
+
+/* Sheets */
+function sheetHtml(){
+  if (!S.sheet) return '';
+  let inner = '';
+  if (S.sheet === 'share'){
+    const rc = [['kita','K','Kita','k'],['jonas','J','Jonas',''],['mami','M','Mami','m']];
+    inner = `<div class="grab"></div><h3>Ankunft teilen</h3>
+      <textarea class="msg" id="shareMsg" data-in="msg" aria-label="Nachricht">${esc(S.msg)}</textarea>
+      <div class="toggle"><span class="tx"><b>Ankunft live verfolgen</b><span class="muted small">Der Link zeigt nur Ziel und Ankunftszeit und läuft nach der Reise ab.</span></span>
+        <button class="sw" role="switch" aria-checked="${S.live}" data-act="liveToggle" aria-label="Ankunft live verfolgen"></button></div>
+      <div><div class="muted small" style="margin-bottom:6px">Senden an</div><div class="rcpts">${rc.map(([id,l,n,c]) => `<button class="rc ${c}" data-act="rcpt" data-id="${id}" aria-pressed="${S.rcpt === id}"><i>${l}</i>${n}</button>`).join('')}</div></div>
+      <button class="pbtn" data-act="shareSend" ${S.rcpt ? '' : 'disabled'}>Senden</button>
+      <button class="link" data-act="recipient">${I.globe}So sieht es die Kita</button>
+      <p class="muted small" style="margin:0">Das Teilen läuft über dein Handy. Plan B sieht deine Kontakte nicht.</p>`;
+  } else if (S.sheet === 'shareDone'){
+    const n = { kita:'Kita Sonnenschein', jonas:'Jonas', mami:'Mami' }[S.rcpt] || 'Kita';
+    inner = `<div class="grab"></div><h3>${n}</h3>
+      <div class="bubble">${esc(S.msg)}${S.live ? '<br><span style="opacity:.85;font-size:12px">Live: Ankunft verfolgen</span>' : ''}</div>
+      ${S.replied ? `<div class="bubble in">Kein Problem, Noah spielt noch.</div>` : `<div class="typing">${n} schreibt …</div>`}
+      <button class="pbtn" data-act="closeSheet">Fertig</button>`;
+  } else if (S.sheet === 'recipient'){
+    inner = `<div class="grab"></div><h3>So sieht es die Kita</h3>
+      <div class="webcard"><div class="webbar">${I.lock}Ankunft von Matthi · Link läuft um 18.30 ab</div><div class="webbody">
+        <span class="pill ok" style="align-self:flex-start">live · aktualisiert 17.18</span>
+        <div class="route-h" style="font-size:17px">Matthi ist unterwegs</div>
+        <div>Ankunft bei euch ca. <b>18.09</b></div>
+        <div class="prog"><i></i><b></b><i class="o"></i><b class="o"></b><i class="o"></i><b class="o"></b><i class="o"></i></div>
+        <div class="prog-l"><span>Zürich</span><span>Brugg 17.40</span><span>Au 17.50</span><span>Lindenberg 18.04</span></div>
+        <span class="muted small">Dieser Link zeigt nur Ziel und Ankunftszeit. Kein Standort, keine weiteren Daten.</span></div></div>
+      <button class="pbtn line" data-act="sheetBack">Zurück</button>`;
+  } else if (S.sheet === 'compReview'){
+    inner = `<div class="grab"></div><h3>Angaben prüfen</h3>
+      <div class="card small"><div class="kv"><span>Reise</span><span>Montag · Zürich HB → Lindenberg</span></div>
+      <div class="kv"><span>Verspätung am Ziel</span><span>72 Min.</span></div>
+      <div class="kv"><span>Abo</span><span>Streckenabo Zürich HB – Brugg AG</span></div>
+      <div class="kv"><span>Auszahlung auf</span><span>Konto •••• 4521</span></div>
+      <div class="kv"><span>Betrag</span><span>Tageswert, mind. CHF 5.–</span></div></div>
+      <button class="pbtn" data-act="compSend">Gesuch senden</button>
+      <button class="link" data-act="closeSheet">Abbrechen</button>`;
+  }
+  return `<div class="sheet-bg" data-act="sheetBg"><div class="sheet" role="dialog" aria-modal="true">${inner}</div></div>`;
+}
+
+/* ================= Rendern ================= */
+function renderPhone(){
+  const v = $('#view');
+  const isLock = S.screen === 'lock';
+  $('#screen').classList.toggle('dark', isLock);
+  $('#sbTime').textContent = hm(S.sim);
+  const map = { lock:vLock, trip:vTrip, alts:vAlts, search:vSearch, results:vResults, conn:vConn, transfer:vTransfer, arrived:vArrived, summary:vSummary, comp:vComp, compDone:vCompDone };
+  const keepScroll = v.dataset.screen === S.screen ? v.scrollTop : 0;
+  v.innerHTML = (map[S.screen] || vTrip)();
+  v.dataset.screen = S.screen;
+  v.scrollTop = keepScroll;
+  if (S.screen === 'search') $('#toSugg').innerHTML = suggHtml();
+  $('#sheetHost').innerHTML = sheetHtml();
+  $('#toastHost').innerHTML = S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : '';
+}
+function renderScene(){
+  const sc = scene(), i = STEPS.indexOf(S.step), test = !$('#mod').hidden;
+  $('#scPlace').textContent = sc.place || '';
+  const vt = $('#scVar'); vt.textContent = S.variant === 'planb' ? 'Mit Plan B' : 'Heute'; vt.classList.toggle('heute', S.variant !== 'planb');
+  $('#lineMap').innerHTML = lineMap();
+  $('#scDots').innerHTML = STEPS.map((s, j) => `<span class="${j === i ? 'on' : (j < i ? 'done' : '')}"></span>`).join('') + `<em>Szene ${i + 1} von ${STEPS.length}</em>`;
+  $('#scTitle').textContent = sc.title || '';
+  $('#scText').textContent = sc.text || '';
+  const th = $('#scThought'); th.textContent = sc.thought ? (sc.thought.startsWith('«') ? sc.thought : `«${sc.thought}»`) : ''; th.classList.toggle('tense', !!sc.tense); th.hidden = !sc.thought;
+  const d = $('#scDurch'); d.hidden = !sc.durch; $('#scDurchText').textContent = sc.durch || '';
+  const b = $('#scBoard'); b.hidden = !sc.board;
+  if (sc.board) b.innerHTML = `<span class="cap">Perronanzeiger Gleis 1 · Anschlüsse</span>
+    <div class="row"><span>17.32</span><span>Postauto Lindenberg</span><span class="x">weg</span></div>
+    <div class="row"><span>17.40</span><span>S-Bahn Au · Bus nach Lindenberg</span><span class="go">Gl. 4</span></div>
+    <div class="row"><span>18.02</span><span>Postauto Lindenberg</span><span>Kante C</span></div>
+    <span class="cap" style="text-transform:none;letter-spacing:0">Gleiche Empfehlung für Reisende ohne Smartphone, z.&nbsp;B. Walter (78)</span>`;
+  const hint = $('#scHint'); hint.textContent = test ? '' : (sc.hint || ''); hint.hidden = test || !sc.hint;
+  const a = $('#scActions');
+  a.innerHTML = sc.next ? `<button class="btn btn-primary" data-act="next">${esc(sc.next.label)} ${I.next}</button>` : '';
+}
+function renderTop(){
+  $('#vHeute').setAttribute('aria-pressed', S.variant === 'heute');
+  $('#vPlanb').setAttribute('aria-pressed', S.variant === 'planb');
+  const sb = $('#soundBtn'); sb.setAttribute('aria-pressed', S.sound); sb.innerHTML = (S.sound ? I.sound : I.mute) + (S.sound ? 'Ton an' : 'Ton aus');
+}
+function render(){ renderTop(); renderPhone(); renderScene(); }
+
+function animateClock(from, to){
+  cancelAnimationFrame(clockAnim);
+  const el = $('#scClock');
+  if (from === to || matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent = hm(to); return; }
+  const t0 = performance.now(), dur = Math.min(1400, 300 + Math.abs(to - from) * 30);
+  const tick = now => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3); const m = Math.round(from + (to - from) * e);
+    el.textContent = hm(m); $('#sbTime').textContent = hm(m); if (p < 1) clockAnim = requestAnimationFrame(tick); };
+  clockAnim = requestAnimationFrame(tick);
+}
+
+/* ================= Ablauf ================= */
+function go(step){
+  const prev = S.sim;
+  S.step = step;
+  S.sim = step === 'kita' ? kitaTime(finalRoute()) : STEP_TIME[step];
+  S.sheet = null; S.hist = [];
+  S.screen = { start:'trip', stopped:'lock', push:'lock', decide:'trip', decided:'trip', brugg:'transfer', kita:'arrived', evening:'summary' }[step];
+  render(); animateClock(prev, S.sim);
+  if (step === 'push'){ chime(); try { navigator.vibrate && navigator.vibrate([90,60,90]); } catch(e){} log('push_shown'); }
+  if (step === 'brugg' && S.sound) speak();
+}
+function nav(screen){ S.hist.push(S.screen); S.screen = screen; S.sheet = null; render(); log('screen:' + screen); }
+function back(){ S.screen = S.hist.pop() || (S.step === 'evening' ? 'summary' : 'trip'); S.sheet = null; render(); }
+function toast(msg){ S.toast = msg; renderPhone(); clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; renderPhone(); }, 2200); }
+
+function choose(id){
+  S.chosen = id; S.conn = null;
+  log('decision:' + id);
+  taskAuto('decision', { choice:id });
+  if (S.step === 'decide' || S.step === 'push') go('decided');
+  else { S.screen = 'trip'; S.hist = []; render(); }
+}
+
+/* Ton: sanfter Zweiklang, kein externes File */
+let actx = null;
+function chime(){
+  if (!S.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    [[880,0],[1318.5,.16]].forEach(([f,t]) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, actx.currentTime + t); g.gain.linearRampToValueAtTime(.18, actx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.001, actx.currentTime + t + .5);
+      o.connect(g).connect(actx.destination); o.start(actx.currentTime + t); o.stop(actx.currentTime + t + .55); });
+  } catch(e){}
+}
+function speak(){
+  const txt = scene().durch; if (!txt) return;
+  try {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt); u.lang = 'de-CH'; u.rate = .98;
+    const vs = speechSynthesis.getVoices(); const v = vs.find(x => /de-CH/i.test(x.lang)) || vs.find(x => /^de/i.test(x.lang)); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+/* ================= Interaktion ================= */
+document.addEventListener('click', e => {
+  const inPhone = !!e.target.closest('#screen');
+  const el = e.target.closest('[data-act]');
+  if (inPhone) tap(el ? el.dataset.act : 'leer');
+  if (!el) return;
+  if (el.dataset.act === 'sheetBg' && e.target !== el) return;
+  act(el.dataset.act, el, e);
+});
+document.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.in;
+  if (k === 'from') S.from = e.target.value;
+  if (k === 'to'){ S.to = e.target.value; const s = $('#toSugg'); if (s) s.innerHTML = suggHtml(); }
+  if (k === 'msg'){ if (S.msg === DEFAULT_MSG) log('share_edit'); S.msg = e.target.value; taskFlag('textEdited', true); }
+  const m = e.target.dataset && e.target.dataset.m;
+  if (m) modInput(e.target);
+});
+document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.m) modInput(e.target); });
+
+function act(a, el){
+  switch (a){
+    case 'next': { const sc = scene(); if (!sc.next) return; if (sc.next.act) act(sc.next.act); else go(sc.next.to); break; }
+    case 'restart': resetScenario(); render(); animateClock(S.sim, S.sim); break;
+    case 'toPlanB': resetScenario('planb'); go('stopped'); break;
+    case 'variant': resetScenario(el.dataset.v); render(); $('#scClock').textContent = hm(S.sim); break;
+    case 'sound': S.sound = !S.sound; if (!S.sound) try { speechSynthesis.cancel(); } catch(e){} renderTop(); break;
+    case 'speak': speak(); log('durchsage'); break;
+    case 'pushOpen': log('push_open'); taskMark('pushOpen'); go('decide'); break;
+    case 'choose': choose(el.dataset.id); break;
+    case 'alts': nav('alts'); taskMark('altsOpen'); break;
+    case 'back': back(); break;
+    case 'tab': {
+      const t = el.dataset.tab;
+      if (t === 'search'){ if (S.screen !== 'search') nav('search'); }
+      else if (t === 'trip'){ S.hist = []; S.screen = S.step === 'evening' ? 'summary' : (['brugg'].includes(S.step) ? 'transfer' : (S.step === 'kita' ? 'arrived' : 'trip')); render(); }
+      else toast('Im Prototyp nicht enthalten.');
+      break;
+    }
+    case 'recent': S.from = el.dataset.f; S.to = el.dataset.t; renderPhone(); log('recent'); break;
+    case 'pickTo': S.to = el.dataset.v; renderPhone(); break;
+    case 'doSearch': {
+      const okFrom = /brugg/i.test(S.from), okTo = /lindenb/i.test(S.to);
+      if (!okTo){ toast('Gib ein Ziel ein, zum Beispiel Lindenberg.'); return; }
+      if (!okFrom){ toast('Im Prototyp gibt es nur Verbindungen ab Brugg AG.'); return; }
+      nav('results'); log('search_run'); break;
+    }
+    case 'conn': S.conn = el.dataset.id; nav('conn'); break;
+    case 'share': S.sheet = 'share'; renderPhone(); log('share_open'); taskMark('shareOpen'); break;
+    case 'liveToggle': S.live = !S.live; renderPhone(); log('live:' + S.live); taskFlag('liveOn', S.live); break;
+    case 'rcpt': S.rcpt = S.rcpt === el.dataset.id ? null : el.dataset.id; const ta = $('#shareMsg'); if (ta) S.msg = ta.value; renderPhone(); break;
+    case 'shareSend': {
+      const ta2 = $('#shareMsg'); if (ta2) S.msg = ta2.value;
+      S.shared = true; S.sheet = 'shareDone'; S.replied = false; renderPhone(); log('share_send:' + S.rcpt);
+      taskAuto('share', { rcpt:S.rcpt });
+      setTimeout(() => { S.replied = true; if (S.sheet === 'shareDone') renderPhone(); }, 1700);
+      break;
+    }
+    case 'recipient': { const ta3 = $('#shareMsg'); if (ta3) S.msg = ta3.value; S.sheet = 'recipient'; renderPhone(); log('recipient_view'); break; }
+    case 'sheetBack': S.sheet = 'share'; renderPhone(); break;
+    case 'closeSheet': case 'sheetBg': S.sheet = null; render(); break;
+    case 'compAuto': S.compAuto = !S.compAuto; renderPhone(); break;
+    case 'compOpen': nav('comp'); taskMark('compOpen'); break;
+    case 'compReview': S.sheet = 'compReview'; renderPhone(); log('comp_review'); break;
+    case 'compSend': S.compSent = true; S.sheet = null; S.hist = ['summary']; S.screen = 'compDone'; render(); log('comp_send'); taskAuto('comp'); break;
+    case 'toastMsg': toast(el.dataset.msg); break;
+    case 'mod': toggleMod(); break;
+    case 'modtab': modTab = el.dataset.t; renderMod(); break;
+    default: if (a.startsWith('m-')) modAct(a, el);
+  }
+}
+
+/* ================= Testmodus: Skript, Messung, Auswertung ================= */
+const TASKS = [
+  { id:1, title:'Anschluss prüfen mit der heutigen App', variant:'heute', auto:'decision', ref:'Nullmessung für A1 und A2 (Element b)',
+    say:'Du sitzt im Interregio von Zürich nach Brugg. In Brugg willst du das Postauto 17.32 nach Lindenberg nehmen. Um 18.15 schliesst die Kita, dort wartet dein Kind. Gleich meldet sich dein Handy. Finde heraus, ob du dein Postauto noch erreichst, und entscheide, wie du nach Lindenberg fährst. Sag bitte laut, was du denkst.',
+    hyp:'H1: Wenn Testpersonen mit der heutigen App selber nach einer Alternative suchen müssen, dann brauchen sie mehr als 60 Sekunden bis zum Entscheid und bewerten ihr Sicherheitsgefühl mit höchstens 3 von 5.',
+    obs:'Zeit von der Mitteilung bis zum Entscheid, Anzahl Taps, Suchweg (Reisebegleiter oder Fahrplan), gewählte Verbindung (rechtzeitig? Billett gültig?), Äusserungen von Unsicherheit.',
+    crit:'Median > 60 s und Ø Sicherheitsgefühl ≤ 3',
+    rating:{ key:'sicher', q:'Wie sicher fühlst du dich jetzt, dass du rechtzeitig bei der Kita bist? (1 = gar nicht, 5 = sehr sicher)' } },
+  { id:2, title:'Anschluss prüfen mit Plan B', variant:'planb', auto:'decision', ref:'A1 Sicherheitsgefühl, A2 Entscheidungsdauer, B1 Umsteige-Hilfe',
+    say:'Gleiche Situation, gleicher Zug, aber jetzt mit Plan B. Gleich meldet sich dein Handy. Erkläre kurz in eigenen Worten, was los ist, und entscheide, wie du nach Lindenberg fährst.',
+    hyp:'H2: Wenn Plan B einen gefährdeten Anschluss mit Ampel, «wartet bis» und fertiger Alternative meldet, dann entscheiden sich Testpersonen in höchstens 30 Sekunden (mindestens 50 % schneller als mit der heutigen App) und bewerten ihr Sicherheitsgefühl mit mindestens 4 von 5 (mindestens +1 gegenüber heute).',
+    obs:'Zeit bis «Plan B übernehmen», ob Gelb und «wartet bis 17.34» richtig erklärt werden, ob «Andere Verbindungen» geöffnet wird, ob Gleis und Sektor danach ohne Hilfe genannt werden.',
+    crit:'Median ≤ 30 s, ≥ 50 % schneller als Aufgabe 1, Ø Sicherheit ≥ 4 und ≥ +1',
+    rating:{ key:'sicher', q:'Wie sicher fühlst du dich jetzt, dass du rechtzeitig bei der Kita bist? (1 = gar nicht, 5 = sehr sicher)' },
+    checks:[{ key:'ampel', q:'Ampel und «wartet bis» richtig erklärt', opts:['ja','teilweise','nein'] }, { key:'gleis', q:'Nachfrage «Wo steigst du in Brugg um?»: Gleis 4, Sektor B genannt', opts:['ja','nein'] }] },
+  { id:3, title:'Billett-Check', variant:'planb', auto:null, ref:'A3 Vertrauen in die Empfehlung, B2 Billett-Fragen; Pain «Ich weiss nicht, ob mein Billett gilt»',
+    say:'Eine Kollegin schreibt dir: «Nimm doch den Bus über Birrhard, der ist eine Minute schneller.» Schau in der App nach: Kannst du diesen Bus mit deinem Abo fahren?',
+    hyp:'H3: Wenn der Billett-Check direkt bei jeder Verbindung steht, dann erkennen Testpersonen innert 20 Sekunden, dass ihr Abo auf der Verbindung über Birrhard nicht gilt, und vertrauen der Angabe mit mindestens 4 von 5.',
+    obs:'Findet die Person «Andere Verbindungen»? Zeit bis zur richtigen Antwort. Wird «Zusatzbillett nötig» gelesen und verstanden? Zweifel wie «würde ich trotzdem nachprüfen»?',
+    crit:'alle gelöst, Median ≤ 20 s, Ø Vertrauen ≥ 4',
+    rating:{ key:'vertrauen', q:'Wie sehr vertraust du der Angabe, ob dein Abo gilt? (1 = gar nicht, 5 = voll)' } },
+  { id:4, title:'Ankunft teilen', variant:'planb', auto:'share', ref:'Sozialer Job «Wartende informieren», Pain «Jemand wartet auf mich»',
+    say:'Die Kita soll wissen, wann du ungefähr ankommst. Gib ihr Bescheid.',
+    hyp:'H4: Wenn Plan B eine vorformulierte Nachricht mit der neuen Ankunftszeit anbietet, dann informieren Testpersonen die Kita in höchstens 20 Sekunden, ohne den Text selber schreiben zu müssen.',
+    obs:'Weg zu «Ankunft teilen», Zeit und Taps bis «Senden», wird der Text angepasst, Reaktion auf «Ankunft live verfolgen» (Nutzen oder Datenschutz-Bedenken).',
+    crit:'alle gelöst, Median ≤ 20 s',
+    rating:{ key:'nutzen', q:'Wie hilfreich ist diese Funktion für dich? (1 = gar nicht, 5 = sehr)' } },
+  { id:5, title:'Entschädigung', variant:'planb', auto:'comp', ref:'B3 Anteil eingereichter Gesuche; Pain «Die Entschädigung ist Papierkram»',
+    say:'Es ist 20.30 Uhr, du bist zuhause. Am Montag hattest du auf der gleichen Strecke 72 Minuten Verspätung. Hol dir die Entschädigung, die dir zusteht.',
+    hyp:'H5: Wenn das Entschädigungsgesuch schon ausgefüllt ist, dann senden Testpersonen es in höchstens 30 Sekunden ab und geben an, dass sie es so einreichen würden (mindestens 4 von 5).',
+    obs:'Zeit und Taps bis «Gesuch senden», ob die Angaben geprüft werden, Fragen zu Betrag oder Konto, Reaktion auf die Tagesbilanz («Minuten gespart»).',
+    crit:'alle gelöst, Median ≤ 30 s, Ø Absicht ≥ 4',
+    rating:{ key:'absicht', q:'Wie wahrscheinlich würdest du das Gesuch so einreichen? (1 = sicher nicht, 5 = sicher)' } }
+];
+const INTRO = [
+  { key:'pendeln', q:'Wie oft fährst du mit dem ÖV zur Arbeit oder Schule?', type:'select', opts:['','täglich','3–4 × pro Woche','1–2 × pro Woche','seltener'] },
+  { key:'app', q:'Nutzt du unterwegs SBB Mobile oder eine andere ÖV-App?', type:'select', opts:['','ja, täglich','ja, ab und zu','nein'] },
+  { key:'zuletzt', q:'Wann hast du zuletzt wegen einer Verspätung einen Anschluss verpasst, und was hast du dann gemacht?', type:'text' }
+];
+const OUTRO = [
+  { key:'best', q:'Was hat dir an Plan B am meisten geholfen?', type:'text' },
+  { key:'worst', q:'Was war unklar oder hat dich gestört?', type:'text' },
+  { key:'use', q:'Wie wahrscheinlich würdest du Plan B einschalten? (1–5)', type:'scale', max:5 },
+  { key:'nps', q:'Wie wahrscheinlich empfiehlst du Plan B weiter? (0–10)', type:'scale', max:10, min:0 },
+  { key:'weg', q:'Welche Funktion würdest du weglassen, und was fehlt dir noch?', type:'text' }
+];
+const CHOICE_TXT = { planb:'S-Bahn 17.40 + Bus (rechtzeitig, Abo gilt)', post1732:'Postauto 17.32 (verpasst)', birrhard:'Bus über Birrhard (Zusatzbillett nötig)', post1802:'Postauto 18.02 (zu spät)' };
+const OUT_TXT = { ok:'gelöst', help:'mit Hilfe', fail:'nicht gelöst' };
+
+const STORE = 'planb-prototyp-tests-v1';
+let sessions = [], cur = null, modTab = 'test', run = null, timerInt = null, confirmDel = false, copyText = '', openState = {};
+document.addEventListener('toggle', e => { const d = e.target; if (d.matches && d.matches('details.task[data-k]')) openState[d.dataset.k] = d.open; }, true);
+try { sessions = JSON.parse(localStorage.getItem(STORE) || '[]'); } catch(e){ sessions = []; }
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(sessions)); } catch(e){} };
+const session = () => sessions.find(s => s.id === cur) || null;
+const activeTask = () => run;
+const taskOrder = s => s && s.order === 'planb-first' ? [2,1,3,4,5] : [1,2,3,4,5];
+const sec = ms => Math.round(ms / 100) / 10;
+
+function log(type){
+  if (!run) return;
+  run.events.push({ t: sec(performance.now() - run.t0), e:type });
+}
+function tap(target){ if (run) run.taps++; }
+function taskMark(k){ if (run && run.marks[k] == null) run.marks[k] = sec(performance.now() - run.t0); }
+function taskFlag(k, v){ if (run) run.flags[k] = v; }
+function taskAuto(kind, data){
+  if (!run) return;
+  const tk = TASKS.find(t => t.id === run.id);
+  if (data && data.choice) run.flags.choice = data.choice;
+  if (data && data.rcpt) run.flags.rcpt = data.rcpt;
+  if (tk.auto === kind) endTask('ok', true);
+}
+function startTask(id){
+  const s = session(); if (!s) return;
+  if (run) endTask('fail');
+  const tk = TASKS.find(t => t.id === id);
+  resetScenario(tk.variant);
+  if (id === 1 || id === 2) go('push');
+  else if (id === 3 || id === 4){ S.chosen = 'planb'; S.shared = false; go('decided'); }
+  else if (id === 5){ S.chosen = 'planb'; S.shared = true; go('evening'); }
+  run = { id, t0: performance.now(), taps:0, events:[], marks:{}, flags:{} };
+  openState = { ['t' + id]: true };
+  if (id === 1 || id === 2) run.events.push({ t:0, e:'push_shown' });
+  clearInterval(timerInt); timerInt = setInterval(updTimer, 250);
+  renderMod(); renderScene();
+}
+function endTask(outcome, auto){
+  if (!run) return;
+  const s = session(); const r = run; run = null; clearInterval(timerInt);
+  if (s){
+    const prev = s.tasks[r.id] || {};
+    s.tasks[r.id] = { ...prev, time: sec(performance.now() - r.t0), taps:r.taps, outcome, auto:!!auto, events:r.events, marks:r.marks, flags:r.flags, at:new Date().toISOString() };
+    save();
+    const nx = taskOrder(s).find(x => !(s.tasks[x] && s.tasks[x].outcome));
+    openState = { ['t' + r.id]: true }; if (nx) openState['t' + nx] = true; else openState.outro = true;
+  }
+  renderMod(); renderScene();
+}
+function updTimer(){ const el = document.getElementById('runTime'); if (el && run) el.textContent = sec(performance.now() - run.t0).toFixed(1) + ' s'; }
+
+function toggleMod(){
+  const m = $('#mod'), open = m.hidden;
+  m.hidden = !open; $('#stage').classList.toggle('with-mod', open); $('#modBtn').setAttribute('aria-pressed', open);
+  if (open) renderMod();
+  renderScene();
+}
+function modInput(el){
+  const s = session(); const k = el.dataset.m;
+  if (k === 'switch'){ cur = el.value || null; renderMod(); return; }
+  if (k === 'new-tp' || k === 'new-profile' || k === 'new-order' || k === 'import') return;
+  if (!s) return;
+  const [scope, key, tid] = k.split(':');
+  if (scope === 'intro'){ s.intro[key] = el.value; }
+  if (scope === 'outro'){ s.outro[key] = el.value; }
+  if (scope === 'note'){ s.tasks[tid] = s.tasks[tid] || {}; s.tasks[tid].note = el.value; }
+  if (scope === 'profile'){ s.profile = el.value; }
+  save();
+}
+function modAct(a, el){
+  const s = session();
+  switch (a){
+    case 'm-new': {
+      const tp = ($('#newTp').value || '').trim() || ('TP' + (sessions.length + 1));
+      const order = document.querySelector('input[name="newOrder"]:checked')?.value || 'heute-first';
+      const id = 'S' + Date.now();
+      sessions.push({ id, tp, profile: ($('#newProfile').value || '').trim(), order, created:new Date().toISOString(), intro:{}, outro:{}, tasks:{}, quotes:[], done:false });
+      cur = id; openState = {}; save(); renderMod(); break;
+    }
+    case 'm-leave': if (run) endTask('fail'); cur = null; renderMod(); break;
+    case 'm-start': startTask(+el.dataset.id); break;
+    case 'm-end': endTask(el.dataset.o); break;
+    case 'm-set': { // nachtraeglich Ergebnis aendern
+      const t = s && s.tasks[el.dataset.id]; if (t){ t.outcome = el.dataset.o; save(); renderMod(); } break; }
+    case 'm-rate': {
+      const tid = el.dataset.id; s.tasks[tid] = s.tasks[tid] || {}; s.tasks[tid].rating = +el.dataset.v; save(); renderMod(); break; }
+    case 'm-check': {
+      const tid = el.dataset.id; s.tasks[tid] = s.tasks[tid] || {}; s.tasks[tid].checks = s.tasks[tid].checks || {}; s.tasks[tid].checks[el.dataset.k] = el.dataset.v; save(); renderMod(); break; }
+    case 'm-oscale': s.outro[el.dataset.k] = +el.dataset.v; save(); renderMod(); break;
+    case 'm-quote': {
+      const inp = document.getElementById('q-' + el.dataset.id); const v = (inp?.value || '').trim(); if (!v) return;
+      s.quotes.push({ task: el.dataset.id === '0' ? null : +el.dataset.id, text:v }); save(); renderMod(); break; }
+    case 'm-delq': s.quotes.splice(+el.dataset.i, 1); save(); renderMod(); break;
+    case 'm-done': s.done = true; if (run) endTask('fail'); save(); renderMod(); break;
+    case 'm-reopen': s.done = false; save(); renderMod(); break;
+    case 'm-copy-tsv': copyOut(tsvExport()); break;
+    case 'm-copy-json': copyOut(JSON.stringify(sessions, null, 2)); break;
+    case 'm-import': {
+      try { const arr = JSON.parse($('#importBox').value); if (!Array.isArray(arr)) throw 0;
+        arr.forEach(x => { if (x && x.id && !sessions.find(y => y.id === x.id)) sessions.push(x); }); save(); copyText = ''; renderMod();
+      } catch(e){ copyText = 'Import fehlgeschlagen: Bitte den kompletten JSON-Text aus «Rohdaten kopieren» einfügen.'; renderMod(); }
+      break; }
+    case 'm-del': confirmDel = true; renderMod(); break;
+    case 'm-del-no': confirmDel = false; renderMod(); break;
+    case 'm-del-yes': sessions = []; cur = null; confirmDel = false; save(); renderMod(); break;
+  }
+}
+function copyOut(text){
+  copyText = text; renderMod();
+  const ta = document.getElementById('copyOut');
+  const fallback = () => { if (ta){ ta.focus(); ta.select(); } };
+  try { navigator.clipboard.writeText(text).then(() => { const n = document.getElementById('copyNote'); if (n) n.textContent = 'Kopiert. Du kannst es jetzt einfügen.'; }, fallback); } catch(e){ fallback(); }
+}
+
+/* --- Rendern Moderation --- */
+function renderMod(){
+  if ($('#mod').hidden) return;
+  $('#mtTest').setAttribute('aria-pressed', modTab === 'test');
+  $('#mtEval').setAttribute('aria-pressed', modTab === 'eval');
+  const body = $('#modBody'), st = body.scrollTop;
+  body.innerHTML = modTab === 'test' ? modTest() : modEval();
+  body.scrollTop = st; updTimer();
+}
+const scaleHtml = (act, attrs, val, max = 5, min = 1) => `<div class="scale">${Array.from({ length:max - min + 1 }, (_, i) => i + min).map(v => `<button data-act="${act}" ${attrs} data-v="${v}" aria-pressed="${val === v}">${v}</button>`).join('')}</div>`;
+
+function modTest(){
+  const s = session();
+  let h = '';
+  if (!s){
+    h += `<div class="mbox"><h4>Neue Testperson</h4>
+      <div class="mrow"><label class="mlabel">Kürzel<input type="text" id="newTp" data-m="new-tp" placeholder="TP${sessions.length + 1}"></label>
+      <label class="mlabel">Kurzprofil<input type="text" id="newProfile" data-m="new-profile" placeholder="z. B. Lernende, Zug + Bus, täglich"></label></div>
+      <div class="mrow" style="font-size:13px"><label><input type="radio" name="newOrder" value="heute-first" ${sessions.length % 2 === 0 ? 'checked' : ''}> Aufgabe 1 (heute) zuerst</label>
+      <label><input type="radio" name="newOrder" value="planb-first" ${sessions.length % 2 === 1 ? 'checked' : ''}> Aufgabe 2 (Plan B) zuerst</label></div>
+      <p class="small" style="margin:0;color:var(--muted)">Die Reihenfolge von Aufgabe 1 und 2 wechselt von Person zu Person, damit Lerneffekte sich ausgleichen.</p>
+      <div class="mrow"><button class="mbtn pri" data-act="m-new">Session starten</button></div></div>`;
+    if (sessions.length) h += `<div class="mbox"><h4>Bestehende Session öffnen</h4><select data-m="switch"><option value="">Auswählen …</option>${sessions.map(x => `<option value="${x.id}">${esc(x.tp)} · ${x.done ? 'abgeschlossen' : 'offen'}</option>`).join('')}</select></div>`;
+    h += `<div class="mbox"><h4>Ablauf pro Testperson (ca. 10 Min.)</h4><ol class="qlist"><li>Begrüssung und Einverständnis (1 Min.)</li><li>Einstiegsfragen (1,5 Min.)</li><li>Aufgaben 1 bis 5 (6,5 Min.)</li><li>Ausstiegsfragen (1,5 Min.)</li></ol></div>`;
+    return h;
+  }
+  const done = Object.keys(s.tasks).filter(k => s.tasks[k].outcome).length;
+  h += `<div class="mbox"><div class="mrow" style="justify-content:space-between"><div><strong>${esc(s.tp)}</strong> <span class="small" style="color:var(--muted)">· ${s.order === 'planb-first' ? 'Plan B zuerst' : 'heute zuerst'} · ${done} von 5 Aufgaben</span></div>
+    <button class="mbtn" data-act="m-leave">Session schliessen</button></div>
+    <label class="mlabel">Kurzprofil<input type="text" data-m="profile" value="${esc(s.profile)}"></label></div>`;
+
+  h += `<details class="task" data-k="intro" ${(openState.intro ?? done === 0) ? 'open' : ''}><summary><span class="no">E</span>Einstieg<span class="st-chip">${Object.values(s.intro).filter(Boolean).length} / 3</span></summary><div class="task-b">
+    <p class="say"><b>Vorlesen</b>Danke, dass du mitmachst. Wir testen eine Idee für eine ÖV-App, nicht dich. Du kannst nichts falsch machen. Sag bitte immer laut, was du denkst und was du suchst. Bist du einverstanden, dass wir Notizen machen?</p>
+    ${INTRO.map(q => `<label class="mlabel">${q.q}${q.type === 'select' ? `<select data-m="intro:${q.key}">${q.opts.map(o => `<option ${s.intro[q.key] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : `<textarea data-m="intro:${q.key}">${esc(s.intro[q.key] || '')}</textarea>`}</label>`).join('')}
+    <p class="say"><b>Szenario vorlesen</b>Stell dir vor, du bist Matthi. Es ist Dienstag, 17.04 Uhr, Feierabend. Du fährst mit dem Zug von Zürich nach Brugg und dann mit dem Postauto nach Lindenberg. Dort holst du dein Kind in der Kita ab. Die Kita schliesst um 18.15.</p></div></details>`;
+
+  taskOrder(s).forEach((id, idx) => {
+    const tk = TASKS.find(t => t.id === id), r = s.tasks[id] || {};
+    const running = run && run.id === id;
+    const chip = running ? `<span class="st-chip run" id="runTime">0.0 s</span>` : (r.outcome ? `<span class="st-chip ${r.outcome}">${OUT_TXT[r.outcome]} · ${r.time} s</span>` : `<span class="st-chip">offen</span>`);
+    const auto = !Object.values(openState).some(Boolean) && !r.outcome && !run && taskOrder(s).slice(0, idx).every(x => s.tasks[x] && s.tasks[x].outcome);
+    const open = running || (openState['t' + id] ?? auto);
+    h += `<details class="task ${running ? 'run' : (r.outcome ? 'done' : '')}" data-k="t${id}" ${open ? 'open' : ''}><summary><span class="no">${id}</span>${tk.title}${chip}</summary><div class="task-b">
+      <p class="say"><b>Vorlesen</b>${tk.say}</p>
+      <div class="meta"><p><b>Hypothese</b><br>${tk.hyp}</p><p><b>Beobachtungsziel</b><br>${tk.obs}</p><p><b>Erfolgskriterium</b> ${tk.crit}<br><b>Bezug</b> ${tk.ref}</p></div>
+      <div class="mrow">${running
+        ? `<button class="mbtn pri" data-act="m-end" data-o="ok">Gelöst</button><button class="mbtn warn" data-act="m-end" data-o="help">Mit Hilfe</button><button class="mbtn bad" data-act="m-end" data-o="fail">Nicht gelöst</button>`
+        : `<button class="mbtn ${r.outcome ? '' : 'pri'}" data-act="m-start" data-id="${id}">${r.outcome ? 'Nochmals starten' : 'Aufgabe starten'}</button>${r.outcome ? `<span class="small" style="color:var(--muted)">Ergebnis ändern:</span>${['ok','help','fail'].map(o => `<button class="mbtn" data-act="m-set" data-id="${id}" data-o="${o}" ${r.outcome === o ? 'disabled' : ''}>${OUT_TXT[o]}</button>`).join('')}` : ''}`}</div>
+      ${!running && tk.auto ? `<p class="small" style="margin:0;color:var(--muted)">Endet automatisch bei ${{ decision:'der Wahl einer Verbindung', share:'«Senden»', comp:'«Gesuch senden»' }[tk.auto]}.</p>` : ''}
+      ${!running && !tk.auto ? `<p class="small" style="margin:0;color:var(--muted)">Auf «Gelöst» drücken, sobald die Person die richtige Antwort sagt.</p>` : ''}
+      ${r.outcome ? `<div class="metrics"><div class="metric"><span>Zeit</span><strong>${r.time} s</strong></div><div class="metric"><span>Taps</span><strong>${r.taps}</strong></div>
+        ${r.marks && r.marks.pushOpen != null ? `<div class="metric"><span>Mitteilung geöffnet</span><strong>${r.marks.pushOpen} s</strong></div>` : ''}
+        ${r.flags && r.flags.choice ? `<div class="metric" style="grid-column:1/-1"><span>Gewählte Verbindung</span><strong>${CHOICE_TXT[r.flags.choice]}</strong></div>` : ''}
+        ${id === 3 && r.marks ? `<div class="metric"><span>Andere Verbindungen</span><strong>${r.marks.altsOpen != null ? r.marks.altsOpen + ' s' : 'nicht geöffnet'}</strong></div>` : ''}
+        ${id === 4 && r.flags ? `<div class="metric"><span>Text angepasst</span><strong>${r.flags.textEdited ? 'ja' : 'nein'}</strong></div><div class="metric"><span>Live-Link</span><strong>${r.flags.liveOn === false ? 'aus' : 'an'}</strong></div>` : ''}</div>
+        <div class="evlog">${(r.events || []).map(e => `${e.t.toFixed(1)} s · ${esc(e.e)}`).join('<br>') || 'keine Ereignisse'}</div>` : ''}
+      <div class="mlabel">${tk.rating.q}${scaleHtml('m-rate', `data-id="${id}"`, r.rating)}</div>
+      ${(tk.checks || []).map(c => `<div class="mlabel">${c.q}<div class="scale">${c.opts.map(o => `<button style="width:auto;padding:0 10px" data-act="m-check" data-id="${id}" data-k="${c.key}" data-v="${o}" aria-pressed="${(r.checks || {})[c.key] === o}">${o}</button>`).join('')}</div></div>`).join('')}
+      <label class="mlabel">Beobachtungen<textarea data-m="note:x:${id}" placeholder="Was tut die Person? Wo zögert sie?">${esc(r.note || '')}</textarea></label>
+      <div class="mrow"><input type="text" id="q-${id}" placeholder="Zitat wörtlich notieren" style="flex:1 1 160px"><button class="mbtn" data-act="m-quote" data-id="${id}">Zitat +</button></div>
+      ${s.quotes.some(q => q.task === id) ? `<ul class="qlist">${s.quotes.map((q, i) => q.task === id ? `<li>«${esc(q.text)}» <button class="mbtn" style="padding:0 6px" data-act="m-delq" data-i="${i}" aria-label="Zitat löschen">×</button></li>` : '').join('')}</ul>` : ''}
+    </div></details>`;
+  });
+
+  h += `<details class="task" data-k="outro" ${openState.outro ? 'open' : ''}><summary><span class="no">A</span>Ausstieg<span class="st-chip">${Object.values(s.outro).filter(v => v !== '' && v != null).length} / 5</span></summary><div class="task-b">
+    ${OUTRO.map(q => q.type === 'scale' ? `<div class="mlabel">${q.q}${scaleHtml('m-oscale', `data-k="${q.key}"`, s.outro[q.key], q.max, q.min ?? 1)}</div>` : `<label class="mlabel">${q.q}<textarea data-m="outro:${q.key}">${esc(s.outro[q.key] || '')}</textarea></label>`).join('')}
+    <div class="mrow"><input type="text" id="q-0" placeholder="Zitat aus dem Ausstieg" style="flex:1 1 160px"><button class="mbtn" data-act="m-quote" data-id="0">Zitat +</button></div>
+    ${s.quotes.some(q => q.task == null) ? `<ul class="qlist">${s.quotes.map((q, i) => q.task == null ? `<li>«${esc(q.text)}» <button class="mbtn" style="padding:0 6px" data-act="m-delq" data-i="${i}">×</button></li>` : '').join('')}</ul>` : ''}
+    <p class="say"><b>Verabschiedung</b>Vielen Dank! Deine Antworten helfen uns, Plan B zu verbessern. Hier ist dein Dankeschön.</p></div></details>`;
+  h += `<div class="mrow">${s.done ? `<span class="verdict v-ok">Session abgeschlossen</span><button class="mbtn" data-act="m-reopen">Wieder öffnen</button>` : `<button class="mbtn pri" data-act="m-done">Session abschliessen</button>`}<button class="mbtn" data-act="modtab" data-t="eval">Zur Auswertung</button></div>`;
+  return h;
+}
+
+/* --- Auswertung --- */
+const med = a => { const b = a.filter(x => x != null && !isNaN(x)).sort((x, y) => x - y); if (!b.length) return null; const m = Math.floor(b.length / 2); return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const avg = a => { const b = a.filter(x => x != null && !isNaN(x)); return b.length ? b.reduce((x, y) => x + y, 0) / b.length : null; };
+const f1 = v => v == null ? '–' : (Math.round(v * 10) / 10).toString();
+function vals(id, k){ return sessions.map(s => s.tasks[id] && s.tasks[id][k]).filter(v => v != null); }
+function outs(id){ return sessions.map(s => s.tasks[id] && s.tasks[id].outcome).filter(Boolean); }
+function hypotheses(){
+  const t1 = med(vals(1,'time')), t2 = med(vals(2,'time')), r1 = avg(vals(1,'rating')), r2 = avg(vals(2,'rating'));
+  const allOk = id => { const o = outs(id); return o.length ? o.every(x => x === 'ok') : null; };
+  const c = (label, val, ok) => ({ label, val, ok });
+  return [
+    { h:'H1', t:'Heute: Entscheid dauert lange, Sicherheit tief', crit:[ c('Median > 60 s', t1 == null ? '–' : f1(t1) + ' s', t1 == null ? null : t1 > 60), c('Ø Sicherheit ≤ 3', f1(r1), r1 == null ? null : r1 <= 3) ] },
+    { h:'H2', t:'Plan B: schneller Entscheid, mehr Sicherheit', crit:[ c('Median ≤ 30 s', t2 == null ? '–' : f1(t2) + ' s', t2 == null ? null : t2 <= 30), c('≥ 50 % schneller als heute', (t1 && t2 != null) ? Math.round((1 - t2 / t1) * 100) + ' %' : '–', (t1 && t2 != null) ? t2 <= t1 * .5 : null),
+      c('Ø Sicherheit ≥ 4', f1(r2), r2 == null ? null : r2 >= 4), c('Sicherheit ≥ +1 ggü. heute', (r1 != null && r2 != null) ? (r2 - r1 >= 0 ? '+' : '') + f1(r2 - r1) : '–', (r1 != null && r2 != null) ? r2 - r1 >= 1 : null) ] },
+    { h:'H3', t:'Billett-Check wird erkannt und geglaubt', crit:[ c('alle gelöst', outs(3).length ? outs(3).filter(x => x === 'ok').length + ' / ' + outs(3).length : '–', allOk(3)), c('Median ≤ 20 s', vals(3,'time').length ? f1(med(vals(3,'time'))) + ' s' : '–', vals(3,'time').length ? med(vals(3,'time')) <= 20 : null), c('Ø Vertrauen ≥ 4', f1(avg(vals(3,'rating'))), avg(vals(3,'rating')) == null ? null : avg(vals(3,'rating')) >= 4) ] },
+    { h:'H4', t:'Ankunft teilen geht schnell', crit:[ c('alle gelöst', outs(4).length ? outs(4).filter(x => x === 'ok').length + ' / ' + outs(4).length : '–', allOk(4)), c('Median ≤ 20 s', vals(4,'time').length ? f1(med(vals(4,'time'))) + ' s' : '–', vals(4,'time').length ? med(vals(4,'time')) <= 20 : null) ] },
+    { h:'H5', t:'Vorausgefülltes Gesuch wird gesendet', crit:[ c('alle gelöst', outs(5).length ? outs(5).filter(x => x === 'ok').length + ' / ' + outs(5).length : '–', allOk(5)), c('Median ≤ 30 s', vals(5,'time').length ? f1(med(vals(5,'time'))) + ' s' : '–', vals(5,'time').length ? med(vals(5,'time')) <= 30 : null), c('Ø Absicht ≥ 4', f1(avg(vals(5,'rating'))), avg(vals(5,'rating')) == null ? null : avg(vals(5,'rating')) >= 4) ] }
+  ].map(x => { const known = x.crit.filter(c => c.ok != null); const okN = known.filter(c => c.ok).length;
+    x.verdict = !known.length ? 'offen' : (known.length < x.crit.length ? (okN === known.length ? 'offen' : 'teilweise') : (okN === x.crit.length ? 'bestätigt' : (okN === 0 ? 'widerlegt' : 'teilweise'))); return x; });
+}
+const vClass = v => ({ 'bestätigt':'v-ok', 'teilweise':'v-part', 'widerlegt':'v-no', 'offen':'v-open' }[v]);
+function modEval(){
+  if (!sessions.length) return `<div class="empty"><b>Noch keine Testdaten.</b><br>Lege im Bereich «Test» eine Testperson an und führe die fünf Aufgaben durch. Hier erscheinen danach Messwerte, Hypothesen-Check und Zitate, bereit zum Kopieren in die Dokumentation.</div>`;
+  let h = `<div class="mbox"><h4>Testpersonen</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>TP</th><th>Profil</th><th>Reihenfolge</th><th>Datum</th><th>Status</th></tr></thead><tbody>
+    ${sessions.map(s => `<tr><td><b>${esc(s.tp)}</b></td><td>${esc(s.profile || '–')}</td><td>${s.order === 'planb-first' ? 'Plan B zuerst' : 'heute zuerst'}</td><td>${new Date(s.created).toLocaleDateString('de-CH')}</td><td>${s.done ? 'abgeschlossen' : 'offen'}</td></tr>`).join('')}</tbody></table></div></div>`;
+  h += `<div class="mbox"><h4>Messwerte je Aufgabe</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>Aufgabe</th>${sessions.map(s => `<th>${esc(s.tp)}</th>`).join('')}</tr></thead><tbody>
+    ${TASKS.map(tk => `<tr><td><b>${tk.id}</b> ${tk.title}</td>${sessions.map(s => { const r = s.tasks[tk.id]; return `<td>${r && r.outcome ? `${r.time} s · ${r.taps} Taps<br>${OUT_TXT[r.outcome]}${r.rating ? ` · ${r.rating}/5` : ''}${r.flags && r.flags.choice ? `<br><span style="color:var(--muted)">${CHOICE_TXT[r.flags.choice]}</span>` : ''}` : '–'}</td>`; }).join('')}</tr>`).join('')}
+    </tbody></table></div></div>`;
+  h += `<div class="mbox"><h4>Hypothesen-Check</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>H</th><th>Kriterium</th><th>Messwert</th><th>erfüllt</th><th>Ergebnis</th></tr></thead><tbody>
+    ${hypotheses().map(x => x.crit.map((c, i) => `<tr>${i === 0 ? `<td rowspan="${x.crit.length}"><b>${x.h}</b><br><span style="color:var(--muted)">${x.t}</span></td>` : ''}<td>${c.label}</td><td>${c.val}</td><td>${c.ok == null ? '–' : (c.ok ? 'ja' : 'nein')}</td>${i === 0 ? `<td rowspan="${x.crit.length}"><span class="verdict ${vClass(x.verdict)}">${x.verdict}</span></td>` : ''}</tr>`).join('')).join('')}
+    </tbody></table></div><p class="small" style="margin:0;color:var(--muted)">Bei wenigen Testpersonen ist das ein Hinweis, kein Beweis. Die Begründung gehört in die Auswertung.</p></div>`;
+  const quotes = sessions.flatMap(s => s.quotes.map(q => ({ ...q, tp:s.tp })));
+  h += `<div class="mbox"><h4>Zitate (${quotes.length})</h4>${quotes.length ? `<ul class="qlist">${quotes.map(q => `<li>«${esc(q.text)}» <span style="color:var(--muted)">(${esc(q.tp)}${q.task ? ', Aufgabe ' + q.task : ', Ausstieg'})</span></li>`).join('')}</ul>` : '<span class="small" style="color:var(--muted)">Noch keine Zitate erfasst.</span>'}</div>`;
+  h += `<div class="mbox"><h4>Ausstieg</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>TP</th><th>Einschalten (1–5)</th><th>Empfehlen (0–10)</th><th>Hilft am meisten</th><th>Unklar / stört</th></tr></thead><tbody>
+    ${sessions.map(s => `<tr><td><b>${esc(s.tp)}</b></td><td>${s.outro.use ?? '–'}</td><td>${s.outro.nps ?? '–'}</td><td>${esc(s.outro.best || '–')}</td><td>${esc(s.outro.worst || '–')}</td></tr>`).join('')}</tbody></table></div></div>`;
+  h += `<div class="mbox"><h4>Für die Dokumentation</h4>
+    <div class="mrow"><button class="mbtn pri" data-act="m-copy-tsv">Tabellen kopieren (für Word)</button><button class="mbtn" data-act="m-copy-json">Rohdaten kopieren (JSON)</button></div>
+    <p class="small" style="margin:0;color:var(--muted)">Word: einfügen, markieren, dann «Tabelle → Text in Tabelle umwandeln» mit Tabstopp. Die JSON-Rohdaten kannst du als Backup aufbewahren oder an Claude geben, um die Auswertung zu schreiben.</p>
+    ${copyText ? `<span class="small" id="copyNote" style="color:var(--accent-strong);font-weight:600">Text unten markiert. Mit Strg+C oder Cmd+C kopieren.</span><textarea class="copyout" id="copyOut" readonly>${esc(copyText)}</textarea>` : ''}</div>`;
+  h += `<div class="mbox"><h4>Daten von einem anderen Gerät übernehmen</h4><textarea id="importBox" data-m="import" placeholder="JSON hier einfügen"></textarea><div class="mrow"><button class="mbtn" data-act="m-import">Importieren</button></div></div>`;
+  h += `<div class="mbox"><h4>Testdaten löschen</h4>${confirmDel ? `<p class="small" style="margin:0">Wirklich alle ${sessions.length} Sessions auf diesem Gerät löschen? Das lässt sich nicht rückgängig machen.</p><div class="mrow"><button class="mbtn bad" data-act="m-del-yes">Ja, alles löschen</button><button class="mbtn" data-act="m-del-no">Abbrechen</button></div>` : `<div class="mrow"><button class="mbtn bad" data-act="m-del">Alle Testdaten löschen</button></div>`}</div>`;
+  return h;
+}
+function tsvExport(){
+  const L = [];
+  L.push('Testpersonen'); L.push(['TP','Profil','Reihenfolge','Datum','Pendeln','App-Nutzung','Zuletzt Anschluss verpasst'].join('\t'));
+  sessions.forEach(s => L.push([s.tp, s.profile, s.order === 'planb-first' ? 'Plan B zuerst' : 'heute zuerst', new Date(s.created).toLocaleDateString('de-CH'), s.intro.pendeln || '', s.intro.app || '', (s.intro.zuletzt || '').replace(/\s+/g,' ')].join('\t')));
+  L.push(''); L.push('Messwerte je Aufgabe'); L.push(['Aufgabe','TP','Zeit (s)','Taps','Ergebnis','Bewertung (1-5)','Gewählte Verbindung','Beobachtungen'].join('\t'));
+  TASKS.forEach(tk => sessions.forEach(s => { const r = s.tasks[tk.id]; if (!r) return;
+    L.push([tk.id + ' ' + tk.title, s.tp, r.time ?? '', r.taps ?? '', r.outcome ? OUT_TXT[r.outcome] : '', r.rating ?? '', r.flags && r.flags.choice ? CHOICE_TXT[r.flags.choice] : '', (r.note || '').replace(/\s+/g,' ')].join('\t')); }));
+  L.push(''); L.push('Hypothesen-Check'); L.push(['Hypothese','Kriterium','Messwert','erfüllt','Ergebnis'].join('\t'));
+  hypotheses().forEach(x => x.crit.forEach((c, i) => L.push([i ? '' : x.h + ' ' + x.t, c.label, c.val, c.ok == null ? '–' : (c.ok ? 'ja' : 'nein'), i ? '' : x.verdict].join('\t'))));
+  L.push(''); L.push('Zitate'); L.push(['TP','Aufgabe','Zitat'].join('\t'));
+  sessions.forEach(s => s.quotes.forEach(q => L.push([s.tp, q.task ? 'Aufgabe ' + q.task : 'Ausstieg', q.text].join('\t'))));
+  L.push(''); L.push('Ausstieg'); L.push(['TP','Einschalten (1-5)','Empfehlen (0-10)','Hilft am meisten','Unklar / stört','Weglassen / fehlt'].join('\t'));
+  sessions.forEach(s => L.push([s.tp, s.outro.use ?? '', s.outro.nps ?? '', (s.outro.best || '').replace(/\s+/g,' '), (s.outro.worst || '').replace(/\s+/g,' '), (s.outro.weg || '').replace(/\s+/g,' ')].join('\t')));
+  return L.join('\n');
+}
+
+/* ================= Start ================= */
+if (location.hash === '#test') toggleMod();
+render();
+$('#scClock').textContent = hm(S.sim);
+window.__planb = { S, go, act, resetScenario, render, startTask, endTask, sessions: () => sessions, toggleMod, modAct }; // fuer automatische Screenshots
+})();
+</script>
+
+</body>
+</html>
