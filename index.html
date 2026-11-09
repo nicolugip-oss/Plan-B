@@ -106,6 +106,21 @@ button{font:inherit;color:inherit;cursor:pointer}
 .board .x{color:#FF8A8F;font-weight:700}
 .board .go{color:#7FE0AE;font-weight:700}
 .board .cap{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#9FB0C6}
+.mood{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:8px 10px}
+.face{width:30px;height:30px;flex:none;display:block}
+.mood-l{display:flex;flex-direction:column;line-height:1.2;min-width:0;flex:1}
+.mood-l b{font-size:14.5px}
+.mood-scale{display:flex;gap:3px;flex:none}
+.mood-scale i{width:12px;height:12px;border-radius:3px;background:var(--line)}
+.mood-scale i.neg{background:var(--bad)}
+.mood-scale i.mid{background:var(--warn)}
+.mood-scale i.pos{background:var(--accent)}
+.curve{background:var(--bg);border-radius:12px;padding:10px 8px 6px;display:flex;flex-direction:column;gap:4px}
+.curve svg{display:block;width:100%;height:auto}
+.cv-t{font:600 9px var(--f-ui);fill:var(--muted)}
+.cv-l{font:700 9.5px var(--f-ui)}
+.strip-face{display:inline-flex;flex:none;align-self:center}
+.strip-face .face{width:20px;height:20px}
 .hint{font-size:13.5px;color:var(--accent-strong);font-weight:600;display:flex;gap:6px;align-items:center}
 .scene-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px}
@@ -396,6 +411,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="scene-meta"><span class="clock" id="scClock">17.04</span><span class="place" id="scPlace"></span><span class="vtag" id="scVar">Mit Plan B</span></div>
       <div class="linemap" id="lineMap"></div>
       <div class="dots" id="scDots"></div>
+      <div class="mood" id="scMood"></div>
       <h2 id="scTitle"></h2>
       <p id="scText"></p>
       <p class="thought" id="scThought"></p>
@@ -404,6 +420,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <div><span class="lbl">Durchsage im Zug</span><span id="scDurchText"></span></div>
       </div>
       <div class="board" id="scBoard" hidden></div>
+      <div class="curve" id="scCurve" hidden></div>
       <p class="hint" id="scHint"></p>
       <div class="scene-actions" id="scActions"></div>
     </div>
@@ -421,7 +438,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <section class="device-wrap" aria-label="Smartphone von Matthi">
     <div class="strip" id="strip" aria-live="polite">
-      <div class="strip-l"><div class="strip-top"><span class="strip-clock" id="stClock">17.04</span><span class="strip-title" id="stTitle"></span></div><span class="strip-hint" id="stHint"></span></div>
+      <div class="strip-l"><div class="strip-top"><span class="strip-face" id="stFace"></span><span class="strip-clock" id="stClock">17.04</span><span class="strip-title" id="stTitle"></span></div><span class="strip-hint" id="stHint"></span></div>
       <div id="stAct"></div>
     </div>
     <div class="phone" id="phone">
@@ -579,6 +596,47 @@ function scene(){
   return {};
 }
 
+/* ================= Matthis Gefuehl (Emotionskurve aus Element b) ================= */
+const CURVE_LABELS = ['Start','Halt','Push','Wahl','Fahrt','Brugg','Kita','Abend'];
+function moodCurve(variant){
+  const r = finalRoute(), late = kitaTime(r) > KITA_CLOSE;
+  if (variant === 'planb') return late ? [1,-1,0,1,1,-1,-1,-1] : [1,-1,0,1,1,1,2,2];
+  return ({ planb:[1,-1,-2,-2,0,-1,1,0], birrhard:[1,-1,-2,-2,-1,-1,0,-2], post1802:[1,-1,-2,-2,-1,-2,-1,-1] })[S.chosen] || [1,-1,-2,-2,-1,-2,-1,-1];
+}
+function moodNow(){
+  const pb = S.variant === 'planb', i = STEPS.indexOf(S.step), late = kitaTime(finalRoute()) > KITA_CLOSE;
+  const pbLabels = ['ruhig','nervös','angespannt, aber informiert','erleichtert','dankbar','sicher', late ? 'peinlich berührt' : 'glücklich', late ? 'verärgert' : 'zufrieden'];
+  const heuteLabels = ['ruhig','nervös','unsicher','gestresst'];
+  const heuteEnd = { post1732:'frustriert', planb:'geschafft, aber gestresst', birrhard:'unsicher wegen Billett', post1802:'schlechtes Gewissen' };
+  const v = moodCurve(S.variant)[i];
+  const label = pb ? pbLabels[i] : (i < 4 ? heuteLabels[i] : (heuteEnd[S.chosen] || 'gestresst'));
+  return { v, label };
+}
+function face(v){
+  const col = v < 0 ? 'var(--bad)' : (v === 0 ? 'var(--warn)' : 'var(--accent)');
+  const mouth = v >= 2 ? 'M7.5 13.5q4.5 5 9 0' : v === 1 ? 'M8 14q4 3 8 0' : v === 0 ? 'M8 15h8' : v === -1 ? 'M8 16q4 -2.5 8 0' : 'M8 17q4 -4.5 8 0';
+  return `<svg class="face" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="${col}"/><circle cx="8.5" cy="9.5" r="1.4" fill="#fff"/><circle cx="15.5" cy="9.5" r="1.4" fill="#fff"/><path d="${mouth}" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`;
+}
+function curveSvg(){
+  const both = S.variant === 'planb';
+  const W = 320, H = 132, L = 24, Rg = 18, T = 10, B = 26;
+  const x = k => L + k * (W - L - Rg) / 7, y = v => T + (2 - v) * (H - T - B) / 4;
+  const line = (vals, color, dash) => `<polyline points="${vals.map((v, k) => `${x(k)},${y(v)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" ${dash ? 'stroke-dasharray="5 4"' : ''}/>` +
+    vals.map((v, k) => `<circle cx="${x(k)}" cy="${y(v)}" r="3.2" fill="var(--surface)" stroke="${color}" stroke-width="2"/>`).join('');
+  const heute = both ? [1,-1,-2,-2,-1,-2,-1,-1] : moodCurve('heute');
+  return `<span class="lbl">Matthis Gefühl ${both ? 'im Vergleich' : 'ohne Plan B'}</span>
+  <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Emotionskurve ${both ? 'heute und mit Plan B' : 'heute'}">
+    <rect x="${L}" y="${T}" width="${W - L - Rg}" height="${y(0) - T}" fill="var(--ok-bg)"/>
+    <rect x="${L}" y="${y(0)}" width="${W - L - Rg}" height="${y(-2) - y(0)}" fill="var(--bad-bg)"/>
+    <line x1="${L}" y1="${y(0)}" x2="${W - Rg}" y2="${y(0)}" stroke="var(--muted)" stroke-width="1"/>
+    ${[2,0,-2].map(v => `<text x="${L - 5}" y="${y(v) + 3}" text-anchor="end" class="cv-t">${v > 0 ? '+' + v : v}</text>`).join('')}
+    ${CURVE_LABELS.map((t, k) => `<text x="${x(k)}" y="${H - 8}" text-anchor="middle" class="cv-t">${t}</text>`).join('')}
+    ${line(heute, 'var(--muted)', true)}
+    ${both ? line(moodCurve('planb'), 'var(--accent)', false) : ''}
+  </svg>
+  <span style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted)"><span style="display:inline-flex;gap:5px;align-items:center;white-space:nowrap"><svg width="20" height="6" aria-hidden="true"><line x1="0" y1="3" x2="20" y2="3" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="5 4"/></svg>heute</span>${both ? '<span style="display:inline-flex;gap:5px;align-items:center;white-space:nowrap;color:var(--accent-strong);font-weight:700"><svg width="20" height="6" aria-hidden="true"><line x1="0" y1="3" x2="20" y2="3" stroke="var(--accent)" stroke-width="2.5"/></svg>mit Plan B</span>' : '<span>Wie wäre der Abend mit Plan B? Probier es aus.</span>'}</span>`;
+}
+
 /* ================= Linienskizze ================= */
 function lineMap(){
   const st = S.step, pb = S.variant === 'planb', r = finalRoute(), i = STEPS.indexOf(st);
@@ -672,7 +730,7 @@ function vLock(){
           <strong><span class="dotw"></span>Anschluss in Brugg wackelt</strong>
           <span class="np">Ankunft ca. 17.34 statt 17.28. Dein Postauto 17.32 wartet höchstens bis 17.34.</span><span class="nact">Plan B ansehen</span></button>`
       : `<button class="notif" data-act="pushOpen"><span class="notif-h"><span class="b grey">${I.train}</span><span>REISEBEGLEITER</span><span>jetzt</span></span>
-          <strong>Verspätung</strong><span class="np">IR 17.04 Zürich HB – Brugg AG: ca. 6 Min. später. Ankunft Brugg ca. 17.34.</span></button>`;
+          <strong>Verspätung</strong><span class="np">IR 17.04 nach Brugg AG: ca. 6 Min. später. Ankunft Brugg ca. 17.34.</span></button>`;
   }
   html += `</div>`;
   if (!push) html += `<div class="wake">Matthis Handy ist in der Tasche.</div>`;
@@ -858,8 +916,8 @@ function vSummary(){
 function vComp(){
   return appbar('Entschädigung', { back:'back' }) + `<div class="pad">
     <div class="compcard" style="background:#F6EFE2"><span class="muted small">Fahrt vom Montag</span><b>Zürich HB → Lindenberg</b><span class="pill warn" style="align-self:flex-start">72 Min. Verspätung am Ziel</span><span class="small">Du hast Anspruch auf eine Entschädigung.</span></div>
-    <ul class="checks"><li>${I.check}Reise erkannt (Reisebegleiter)</li><li>${I.check}Abo erkannt: Streckenabo Zürich HB – Brugg AG</li><li>${I.check}Bankkonto hinterlegt</li></ul>
-    <div class="card small"><div class="kv"><span>Betrag</span><span>Tageswert deines Abos,<br>mindestens CHF 5.–</span></div><div class="kv"><span>Berechnung</span><span>durch die Alliance SwissPass</span></div></div>
+    <ul class="checks"><li>${I.check}Reise erkannt (Reisebegleiter)</li><li>${I.check}Abo erkannt: Streckenabo Zürich HB-Brugg AG</li><li>${I.check}Bankkonto hinterlegt</li></ul>
+    <div class="card small"><div class="kv"><span>Betrag</span><span>Tageswert deines Abos,<br>mindestens CHF 5.00</span></div><div class="kv"><span>Berechnung</span><span>durch die Alliance SwissPass</span></div></div>
     <div class="saved">${I.check}Das Gesuch ist ausgefüllt.</div>
     <button class="pbtn" data-act="compReview">Prüfen und senden</button>
     <p class="muted small" style="margin:0">Frist: 30 Tage nach der Reise. Wir erinnern dich daran.</p></div>`;
@@ -905,9 +963,9 @@ function sheetHtml(){
     inner = `<div class="grab"></div><h3>Angaben prüfen</h3>
       <div class="card small"><div class="kv"><span>Reise</span><span>Montag · Zürich HB → Lindenberg</span></div>
       <div class="kv"><span>Verspätung am Ziel</span><span>72 Min.</span></div>
-      <div class="kv"><span>Abo</span><span>Streckenabo Zürich HB – Brugg AG</span></div>
+      <div class="kv"><span>Abo</span><span>Streckenabo Zürich HB-Brugg AG</span></div>
       <div class="kv"><span>Auszahlung auf</span><span>Konto •••• 4521</span></div>
-      <div class="kv"><span>Betrag</span><span>Tageswert, mind. CHF 5.–</span></div></div>
+      <div class="kv"><span>Betrag</span><span>Tageswert, mind. CHF 5.00</span></div></div>
       <button class="pbtn" data-act="compSend">Gesuch senden</button>
       <button class="link" data-act="closeSheet">Abbrechen</button>`;
   }
@@ -934,6 +992,11 @@ function renderScene(){
   $('#scPlace').textContent = sc.place || '';
   const vt = $('#scVar'); vt.textContent = S.variant === 'planb' ? 'Mit Plan B' : 'Heute'; vt.classList.toggle('heute', S.variant !== 'planb');
   $('#lineMap').innerHTML = lineMap();
+  const md = moodNow();
+  $('#scMood').innerHTML = `${face(md.v)}<span class="mood-l"><span class="lbl">Matthis Gefühl</span><b>${md.label}</b></span><span class="mood-scale" aria-label="Gefühl ${md.v} auf einer Skala von minus 2 bis plus 2">${[-2,-1,0,1,2].map(v => `<i class="${v === md.v ? (v < 0 ? 'neg' : v === 0 ? 'mid' : 'pos') : ''}"></i>`).join('')}</span>`;
+  $('#stFace').innerHTML = face(md.v);
+  const cv = $('#scCurve'), showCurve = (S.variant === 'planb' && S.step === 'evening') || (S.variant === 'heute' && S.step === 'decided');
+  cv.hidden = !showCurve; cv.innerHTML = showCurve ? curveSvg() : '';
   $('#scDots').innerHTML = STEPS.map((s, j) => `<span class="${j === i ? 'on' : (j < i ? 'done' : '')}"></span>`).join('') + `<em>Szene ${i + 1} von ${STEPS.length}</em>`;
   $('#scTitle').textContent = sc.title || '';
   $('#scText').textContent = sc.text || '';
