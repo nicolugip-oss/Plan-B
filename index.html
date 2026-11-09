@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <title>Plan B Prototyp</title>
-<meta name="description" content="Klickbarer Prototyp des Anschluss-Assistenten Plan B (Schulprojekt ÜK 368, Element c) mit Szenario, Vergleichsvariante und Testmodus.">
+<meta name="description" content="Klickbarer Prototyp des Anschluss-Assistenten Plan B (Schulprojekt ÜK 368, Element c) mit Szenario, Vergleichsvariante und Rundgang.">
 <meta name="theme-color" content="#2E9E6A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232E9E6A%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-family=%27Arial,sans-serif%27 font-size=%2720%27 font-weight=%27700%27 fill=%27white%27 text-anchor=%27middle%27%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -356,11 +356,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .compcard{background:var(--p-card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
 
 /* ---------- Rundgang ---------- */
-.guide{position:fixed;inset:0;z-index:100}
+html{scrollbar-gutter:stable}
+html.g-lock,html.g-lock body{overflow:hidden;overscroll-behavior:none}
+.guide{position:fixed;inset:0;z-index:100;touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .g-shade{position:absolute;inset:0;background:rgba(10,16,26,.6)}
 .g-spot{position:absolute;border-radius:20px;box-shadow:0 0 0 200vmax rgba(10,16,26,.6);outline:3px solid var(--accent);outline-offset:3px;transition:top .3s ease,left .3s ease,width .3s ease,height .3s ease;pointer-events:none}
-.g-card{position:absolute;width:min(380px,calc(100vw - 32px));background:var(--surface);color:var(--ink);border-radius:20px;padding:20px;box-shadow:0 24px 60px -12px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:12px}
-.g-card.center{left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto}
+.g-card{position:absolute;overscroll-behavior:contain;width:min(380px,calc(100vw - 32px));background:var(--surface);color:var(--ink);border-radius:20px;padding:20px;box-shadow:0 24px 60px -12px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:12px}
+.g-card.center{left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto;touch-action:pan-y}
 .g-card.dock{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));top:auto;width:auto}
 .g-top{display:flex;align-items:center;gap:10px}
 .g-step{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-strong)}
@@ -1166,16 +1168,39 @@ const GUIDE = [
 let gStep = -1, gRaf = 0;
 function openGuide(i = 0){
   gStep = i; $('#guide').hidden = false;
+  gLock(true);
   document.addEventListener('keydown', gKey); addEventListener('resize', gPlaceSoon); addEventListener('scroll', gPlaceSoon, { passive:true });
   showGuide();
 }
 function closeGuide(){
   if (gStep < 0) return;
   gStep = -1; $('#guide').hidden = true;
+  gLock(false);
   document.removeEventListener('keydown', gKey); removeEventListener('resize', gPlaceSoon); removeEventListener('scroll', gPlaceSoon);
   try { localStorage.setItem(GUIDE_KEY, '1'); } catch(e){}
   const btn = shown('#stAct button') || shown('#scActions button');
   if (btn){ btn.scrollIntoView({ block:'center' }); btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 4200); try { btn.focus({ preventScroll:true }); } catch(e){} }
+}
+/* Waehrend des Rundgangs bleibt alles fixiert: kein Scrollen, Wischen oder Zoomen mit Touchpad,
+   Mausrad oder Finger. Nur Klicken geht. Ausnahme: Die Karte selbst darf scrollen, wenn sie auf
+   kleinen Bildschirmen nicht ganz Platz hat. */
+const gOpts = { passive:false, capture:true };
+function gCardScrolls(t){ const c = $('#gCard'); return c.contains(t) && c.scrollHeight > c.clientHeight + 1 ? c : null; }
+function gBlock(e){
+  if (gStep < 0) return;
+  if (e.type === 'wheel' && !e.ctrlKey){
+    const c = gCardScrolls(e.target);
+    if (c && Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+      const atTop = c.scrollTop <= 0, atEnd = c.scrollTop + c.clientHeight >= c.scrollHeight - 1;
+      if (!((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atEnd))) return;
+    }
+  } else if (e.type === 'touchmove' && e.touches.length === 1 && gCardScrolls(e.target)) return;
+  e.preventDefault();
+}
+const G_EVENTS = ['wheel', 'touchmove', 'gesturestart', 'gesturechange', 'dragstart'];
+function gLock(on){
+  document.documentElement.classList.toggle('g-lock', on);
+  G_EVENTS.forEach(t => on ? addEventListener(t, gBlock, gOpts) : removeEventListener(t, gBlock, gOpts));
 }
 function guideNext(){ if (gStep >= GUIDE.length - 1) closeGuide(); else { gStep++; showGuide(); } }
 function guideBack(){ if (gStep > 0){ gStep--; showGuide(); } }
@@ -1183,6 +1208,7 @@ function gKey(e){
   if (e.key === 'Escape'){ e.preventDefault(); closeGuide(); }
   else if (e.key === 'ArrowRight'){ e.preventDefault(); guideNext(); }
   else if (e.key === 'ArrowLeft'){ e.preventDefault(); guideBack(); }
+  else if (['ArrowUp','ArrowDown','PageUp','PageDown','Home','End'].includes(e.key) || (e.key === ' ' && !e.target.closest('button'))) e.preventDefault();
 }
 function showGuide(){
   const st = GUIDE[gStep], n = GUIDE.length - 1, intro = gStep === 0;
