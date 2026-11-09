@@ -1,4 +1,4 @@
-# Plan B – Anschluss-Assistent (Prototyp)
+# Plan B, der Anschluss-Assistent (Prototyp)
 
 Klickbarer Prototyp aus dem Schulprojekt **ÜK 368 «Lösungsmöglichkeiten für Kundenerlebnisse erarbeiten», Element c**
 von Nico Luginbühl und Enea Perucchini.
@@ -17,10 +17,11 @@ Der Prototyp spielt den Dienstagabend unserer Persona Matthi in acht Szenen durc
 
 ## So funktioniert der Prototyp
 
-Beim ersten Besuch erklärt ein kurzer Rundgang in vier Schritten, wie alles funktioniert. Über den Knopf «Rundgang» oben lässt er sich jederzeit nochmals starten.
+Beim ersten Besuch erklärt ein kurzer Rundgang in vier Schritten, wie alles funktioniert. Über den Knopf «Rundgang» oben lässt er sich jederzeit nochmals starten. Solange er offen ist, bleibt die Seite fixiert.
 
 - **Geschichte (links):** Uhrzeit, Streckenskizze, Durchsage und Perronanzeiger. Mit dem grünen Knopf geht die Zeit weiter.
-- **Smartphone (Mitte):** Matthis Handy, voll klickbar.
+- **Smartphone (rechts):** Matthis Handy, voll klickbar.
+- **Matthis Gefühl:** Jede Szene zeigt, wie sich Matthi fühlt. Am Abend vergleicht eine Kurve den Abend heute und mit Plan B.
 - **Heute / Mit Plan B:** Umschalter oben. «Heute» zeigt dieselbe Situation mit der heutigen App als Vergleich.
 - **Auf dem Handy:** Über dem Handy-Mockup läuft eine kompakte Leiste mit Uhrzeit und Weiter-Knopf mit, damit man nicht scrollen muss.
 
