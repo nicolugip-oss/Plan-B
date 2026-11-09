@@ -70,9 +70,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ---------- Buehne ---------- */
 .stage{display:grid;grid-template-columns:minmax(260px,360px) auto;justify-content:center;align-items:start;gap:28px;
   padding-block:22px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.stage.with-mod{grid-template-columns:minmax(250px,330px) auto minmax(320px,400px)}
-@media (max-width:1180px){.stage.with-mod{grid-template-columns:minmax(250px,340px) auto}.stage.with-mod .mod{grid-column:1 / -1;max-width:980px;width:100%;justify-self:center}}
-@media (max-width:780px){.stage,.stage.with-mod{grid-template-columns:minmax(0,1fr);gap:16px}.device-wrap{justify-self:center}}
+@media (max-width:780px){.stage{grid-template-columns:minmax(0,1fr);gap:16px}.device-wrap{justify-self:center}}
 
 /* ---------- Szene ---------- */
 .scene{display:flex;flex-direction:column;gap:14px;min-width:0;position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px)}
@@ -342,64 +340,33 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes pop{from{transform:scale(.4);opacity:0}}
 .compcard{background:var(--p-card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
 
-/* ---------- Moderation ---------- */
-.mod{background:var(--surface);border:1px solid var(--line);border-radius:18px;min-width:0;display:flex;flex-direction:column;max-height:calc(100svh - 110px);position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px)}
-@media (max-width:1180px){.mod{position:static;max-height:none}}
-.mod-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.mod-head strong{font-size:15px}
-.mod-body{overflow:auto;padding:14px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.mod-body > *{flex:none}
-.mod h4{margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.mbox{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
-.mrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.mrow > *{min-width:0}
-.mlabel{font-size:12.5px;font-weight:600;display:flex;flex-direction:column;gap:4px}
-.mrow > .mlabel{flex:1 1 140px}
-.mod input[type=text],.mod select,.mod textarea{font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:var(--bg);color:var(--ink);width:100%}
-.mod textarea{min-height:56px;resize:vertical}
-.mbtn{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:7px 11px;font-size:13px;font-weight:700;color:var(--ink)}
-.mbtn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.mbtn.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
-.mbtn.bad{background:var(--bad-bg);border-color:transparent;color:var(--bad)}
-.task{border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}
-.task > summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;gap:8px;align-items:center;font-weight:700;font-size:14px}
-.task > summary::-webkit-details-marker{display:none}
-.task .no{width:24px;height:24px;border-radius:7px;background:var(--surface-2);display:grid;place-items:center;font-size:12.5px;flex:none}
-.task.run{border-color:var(--accent)}
-.task.run .no{background:var(--accent);color:var(--on-accent)}
-.task.done .no{background:var(--ink);color:var(--bg)}
-.st-chip{margin-left:auto;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
-.st-chip.run{background:var(--ok-bg);color:var(--accent-strong)}
-.st-chip.ok{background:var(--ok-bg);color:var(--accent-strong)}
-.st-chip.help{background:var(--warn-bg);color:var(--warn)}
-.st-chip.fail{background:var(--bad-bg);color:var(--bad)}
-.task-b{padding:0 12px 12px;display:flex;flex-direction:column;gap:9px}
-.say{margin:0;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13.5px}
-.say b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
-.meta{font-size:12.5px;display:flex;flex-direction:column;gap:6px}
-.meta p{margin:0}
-.meta b{color:var(--muted);font-weight:700}
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
-.metric{background:var(--bg);border-radius:9px;padding:7px 9px}
-.metric span{display:block;font-size:11px;color:var(--muted)}
-.metric strong{font-size:14px;font-variant-numeric:tabular-nums}
-.scale{display:flex;gap:4px;flex-wrap:wrap}
-.scale button{width:32px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-weight:700;font-size:13px}
-.scale button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.qlist{margin:0;padding-left:16px;font-size:13px;display:flex;flex-direction:column;gap:3px}
-.evlog{font-size:11.5px;color:var(--muted);max-height:90px;overflow:auto;font-variant-numeric:tabular-nums;background:var(--bg);border-radius:8px;padding:6px 8px}
-.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-.tbl{border-collapse:collapse;font-size:12.5px;width:100%;min-width:420px}
-.tbl th,.tbl td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-.tbl th{background:var(--surface-2);font-size:11.5px}
-.tbl td{font-variant-numeric:tabular-nums}
-.verdict{font-weight:700;font-size:12px;padding:2px 7px;border-radius:6px;white-space:nowrap}
-.v-ok{background:var(--ok-bg);color:var(--accent-strong)}
-.v-part{background:var(--warn-bg);color:var(--warn)}
-.v-no{background:var(--bad-bg);color:var(--bad)}
-.v-open{background:var(--surface-2);color:var(--muted)}
-.empty{color:var(--muted);font-size:13.5px;background:var(--bg);border-radius:12px;padding:14px}
-.copyout{min-height:110px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
+/* ---------- Rundgang ---------- */
+.guide{position:fixed;inset:0;z-index:100}
+.g-shade{position:absolute;inset:0;background:rgba(10,16,26,.6)}
+.g-spot{position:absolute;border-radius:20px;box-shadow:0 0 0 200vmax rgba(10,16,26,.6);outline:3px solid var(--accent);outline-offset:3px;transition:top .3s ease,left .3s ease,width .3s ease,height .3s ease;pointer-events:none}
+.g-card{position:absolute;width:min(380px,calc(100vw - 32px));background:var(--surface);color:var(--ink);border-radius:20px;padding:20px;box-shadow:0 24px 60px -12px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:12px}
+.g-card.center{left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto}
+.g-card.dock{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));top:auto;width:auto}
+.g-top{display:flex;align-items:center;gap:10px}
+.g-step{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-strong)}
+.g-x{margin-left:auto;width:34px;height:34px;border-radius:50%;border:0;background:var(--surface-2);color:var(--ink);display:grid;place-items:center;flex:none}
+.g-x svg{width:16px;height:16px}
+.g-card h2{margin:0;font-size:22px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+.g-body{display:flex;flex-direction:column;gap:10px;font-size:15px}
+.g-body p{margin:0}
+.g-story{background:var(--surface-2);border-radius:14px;padding:12px 14px;font-size:14.5px}
+.g-small{font-size:13px;color:var(--muted)}
+.g-hero{display:flex;align-items:center;gap:12px}
+.g-hero .brand-badge{width:46px;height:46px;font-size:25px;border-radius:12px}
+.g-hero .g-tag{font-family:var(--f-hand);font-size:24px;color:var(--accent-strong);line-height:1.1}
+.g-dots{display:flex;gap:6px}
+.g-dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.g-dots i.on{background:var(--accent)}
+.g-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.g-act .sp{flex:1}
+.g-act .btn{padding:10px 16px;font-size:15px}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,158,106,.55)}100%{box-shadow:0 0 0 16px rgba(46,158,106,0)}}
+.btn.pulse{animation:pulse 1.3s ease-out 3}
 
 .foot{padding-block:10px 22px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));text-align:center;font-size:12px;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -419,7 +386,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <button class="tbtn" id="soundBtn" data-act="sound" aria-pressed="true" title="Ton für Mitteilung und Durchsage"></button>
     <button class="tbtn" data-act="restart" title="Szenario neu starten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Neu starten</button>
-    <button class="tbtn" id="modBtn" data-act="mod" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6M10 2h4M12 9v4l2 2"/><circle cx="12" cy="13" r="8"/></svg>Testmodus</button>
+    <button class="tbtn" id="guideBtn" data-act="guide" title="Kurze Einführung nochmals ansehen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>Rundgang</button>
   </div>
 </header>
 
@@ -443,10 +410,10 @@ button{font:inherit;color:inherit;cursor:pointer}
     <details class="about">
       <summary>So funktioniert der Prototyp</summary>
       <ul>
-        <li>Links läuft die Szene aus unserem Storyboard. Mit dem grünen Knopf geht die Zeit weiter.</li>
+        <li>Links läuft die Geschichte aus unserem Storyboard. Mit dem grünen Knopf geht die Zeit weiter.</li>
         <li>In der Mitte bedienst du das Handy von Matthi wie eine echte App.</li>
         <li>Oben wechselst du zwischen <b>Heute</b> (App ohne Plan B) und <b>Mit Plan B</b>.</li>
-        <li><b>Testmodus</b> öffnet das Moderations-Skript mit Zeitmessung, Bewertungen und Auswertung.</li>
+        <li><b>Rundgang</b> zeigt die kurze Einführung nochmals.</li>
       </ul>
       <p>Schulprojekt ÜK 368 von Nico Luginbühl und Enea Perucchini. Fahrplan, Orte und Personen sind erfunden. Kein Produkt der SBB.</p>
     </details>
@@ -468,19 +435,15 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
   </section>
 
-  <aside class="mod" id="mod" hidden aria-label="Moderation">
-    <div class="mod-head">
-      <strong>Testmodus</strong>
-      <div class="seg" role="group" aria-label="Bereich">
-        <button data-act="modtab" data-t="test" id="mtTest" aria-pressed="true">Test</button>
-        <button data-act="modtab" data-t="eval" id="mtEval" aria-pressed="false">Auswertung</button>
-      </div>
-    </div>
-    <div class="mod-body" id="modBody"></div>
-  </aside>
 </main>
 
 <footer class="foot">Plan B · Schulprojekt ÜK 368 · Nico Luginbühl, Enea Perucchini · Fahrplan, Orte und Personen fiktiv · kein Produkt der SBB</footer>
+
+<div class="guide" id="guide" hidden>
+  <div class="g-shade" id="gShade"></div>
+  <div class="g-spot" id="gSpot" hidden></div>
+  <div class="g-card" id="gCard" role="dialog" aria-modal="true" aria-labelledby="gTitle"></div>
+</div>
 
 <script>
 (() => {
@@ -967,7 +930,7 @@ function renderPhone(){
   $('#toastHost').innerHTML = S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : '';
 }
 function renderScene(){
-  const sc = scene(), i = STEPS.indexOf(S.step), test = !$('#mod').hidden;
+  const sc = scene(), i = STEPS.indexOf(S.step);
   $('#scPlace').textContent = sc.place || '';
   const vt = $('#scVar'); vt.textContent = S.variant === 'planb' ? 'Mit Plan B' : 'Heute'; vt.classList.toggle('heute', S.variant !== 'planb');
   $('#lineMap').innerHTML = lineMap();
@@ -982,12 +945,12 @@ function renderScene(){
     <div class="row"><span>17.40</span><span>S-Bahn Au · Bus nach Lindenberg</span><span class="go">Gl. 4</span></div>
     <div class="row"><span>18.02</span><span>Postauto Lindenberg</span><span>Kante C</span></div>
     <span class="cap" style="text-transform:none;letter-spacing:0">Gleiche Empfehlung für Reisende ohne Smartphone, z.&nbsp;B. Walter (78)</span>`;
-  const hint = $('#scHint'); hint.textContent = test ? '' : (sc.hint || ''); hint.hidden = test || !sc.hint;
+  const hint = $('#scHint'); hint.textContent = sc.hint || ''; hint.hidden = !sc.hint;
   const a = $('#scActions');
   a.innerHTML = sc.next ? `<button class="btn btn-primary" data-act="next">${esc(sc.next.label)} ${I.next}</button>` : '';
   $('#stClock').textContent = hm(S.sim);
   $('#stTitle').textContent = sc.title || '';
-  const sh = $('#stHint'); sh.textContent = test ? '' : (sc.hint || ''); sh.hidden = test || !sc.hint;
+  const sh = $('#stHint'); sh.textContent = sc.hint || ''; sh.hidden = !sc.hint;
   $('#stAct').innerHTML = sc.next ? `<button class="btn btn-primary" data-act="next">${esc(sc.next.label)}</button>` : '';
 }
 function renderTop(){
@@ -1015,17 +978,15 @@ function go(step){
   S.sheet = null; S.hist = [];
   S.screen = { start:'trip', stopped:'lock', push:'lock', decide:'trip', decided:'trip', brugg:'transfer', kita:'arrived', evening:'summary' }[step];
   render(); animateClock(prev, S.sim);
-  if (step === 'push'){ chime(); try { navigator.vibrate && navigator.vibrate([90,60,90]); } catch(e){} log('push_shown'); }
+  if (step === 'push'){ chime(); try { navigator.vibrate && navigator.vibrate([90,60,90]); } catch(e){} }
   if (step === 'brugg' && S.sound) speak();
 }
-function nav(screen){ S.hist.push(S.screen); S.screen = screen; S.sheet = null; render(); log('screen:' + screen); }
+function nav(screen){ S.hist.push(S.screen); S.screen = screen; S.sheet = null; render(); }
 function back(){ S.screen = S.hist.pop() || (S.step === 'evening' ? 'summary' : 'trip'); S.sheet = null; render(); }
 function toast(msg){ S.toast = msg; renderPhone(); clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; renderPhone(); }, 2200); }
 
 function choose(id){
   S.chosen = id; S.conn = null;
-  log('decision:' + id);
-  taskAuto('decision', { choice:id });
   if (S.step === 'decide' || S.step === 'push') go('decided');
   else { S.screen = 'trip'; S.hist = []; render(); }
 }
@@ -1054,9 +1015,7 @@ function speak(){
 
 /* ================= Interaktion ================= */
 document.addEventListener('click', e => {
-  const inPhone = !!e.target.closest('#screen');
   const el = e.target.closest('[data-act]');
-  if (inPhone) tap(el ? el.dataset.act : 'leer');
   if (!el) return;
   if (el.dataset.act === 'sheetBg' && e.target !== el) return;
   act(el.dataset.act, el, e);
@@ -1065,11 +1024,8 @@ document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.in;
   if (k === 'from') S.from = e.target.value;
   if (k === 'to'){ S.to = e.target.value; const s = $('#toSugg'); if (s) s.innerHTML = suggHtml(); }
-  if (k === 'msg'){ if (S.msg === DEFAULT_MSG) log('share_edit'); S.msg = e.target.value; taskFlag('textEdited', true); }
-  const m = e.target.dataset && e.target.dataset.m;
-  if (m) modInput(e.target);
+  if (k === 'msg'){ if (S.msg === DEFAULT_MSG) S.msg = e.target.value; }
 });
-document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.m) modInput(e.target); });
 
 function act(a, el){
   switch (a){
@@ -1078,10 +1034,10 @@ function act(a, el){
     case 'toPlanB': resetScenario('planb'); go('stopped'); break;
     case 'variant': resetScenario(el.dataset.v); render(); $('#scClock').textContent = hm(S.sim); break;
     case 'sound': S.sound = !S.sound; if (!S.sound) try { speechSynthesis.cancel(); } catch(e){} renderTop(); break;
-    case 'speak': speak(); log('durchsage'); break;
-    case 'pushOpen': log('push_open'); taskMark('pushOpen'); go('decide'); break;
+    case 'speak': speak(); break;
+    case 'pushOpen': go('decide'); break;
     case 'choose': choose(el.dataset.id); break;
-    case 'alts': nav('alts'); taskMark('altsOpen'); break;
+    case 'alts': nav('alts'); break;
     case 'back': back(); break;
     case 'tab': {
       const t = el.dataset.tab;
@@ -1090,340 +1046,127 @@ function act(a, el){
       else toast('Im Prototyp nicht enthalten.');
       break;
     }
-    case 'recent': S.from = el.dataset.f; S.to = el.dataset.t; renderPhone(); log('recent'); break;
+    case 'recent': S.from = el.dataset.f; S.to = el.dataset.t; renderPhone(); break;
     case 'pickTo': S.to = el.dataset.v; renderPhone(); break;
     case 'doSearch': {
       const okFrom = /brugg/i.test(S.from), okTo = /lindenb/i.test(S.to);
       if (!okTo){ toast('Gib ein Ziel ein, zum Beispiel Lindenberg.'); return; }
       if (!okFrom){ toast('Im Prototyp gibt es nur Verbindungen ab Brugg AG.'); return; }
-      nav('results'); log('search_run'); break;
+      nav('results'); break;
     }
     case 'conn': S.conn = el.dataset.id; nav('conn'); break;
-    case 'share': S.sheet = 'share'; renderPhone(); log('share_open'); taskMark('shareOpen'); break;
-    case 'liveToggle': S.live = !S.live; renderPhone(); log('live:' + S.live); taskFlag('liveOn', S.live); break;
+    case 'share': S.sheet = 'share'; renderPhone(); break;
+    case 'liveToggle': S.live = !S.live; renderPhone(); break;
     case 'rcpt': S.rcpt = S.rcpt === el.dataset.id ? null : el.dataset.id; const ta = $('#shareMsg'); if (ta) S.msg = ta.value; renderPhone(); break;
     case 'shareSend': {
       const ta2 = $('#shareMsg'); if (ta2) S.msg = ta2.value;
-      S.shared = true; S.sheet = 'shareDone'; S.replied = false; renderPhone(); log('share_send:' + S.rcpt);
-      taskAuto('share', { rcpt:S.rcpt });
+      S.shared = true; S.sheet = 'shareDone'; S.replied = false; renderPhone();
       setTimeout(() => { S.replied = true; if (S.sheet === 'shareDone') renderPhone(); }, 1700);
       break;
     }
-    case 'recipient': { const ta3 = $('#shareMsg'); if (ta3) S.msg = ta3.value; S.sheet = 'recipient'; renderPhone(); log('recipient_view'); break; }
+    case 'recipient': { const ta3 = $('#shareMsg'); if (ta3) S.msg = ta3.value; S.sheet = 'recipient'; renderPhone(); break; }
     case 'sheetBack': S.sheet = 'share'; renderPhone(); break;
     case 'closeSheet': case 'sheetBg': S.sheet = null; render(); break;
     case 'compAuto': S.compAuto = !S.compAuto; renderPhone(); break;
-    case 'compOpen': nav('comp'); taskMark('compOpen'); break;
-    case 'compReview': S.sheet = 'compReview'; renderPhone(); log('comp_review'); break;
-    case 'compSend': S.compSent = true; S.sheet = null; S.hist = ['summary']; S.screen = 'compDone'; render(); log('comp_send'); taskAuto('comp'); break;
+    case 'compOpen': nav('comp'); break;
+    case 'compReview': S.sheet = 'compReview'; renderPhone(); break;
+    case 'compSend': S.compSent = true; S.sheet = null; S.hist = ['summary']; S.screen = 'compDone'; render(); break;
     case 'toastMsg': toast(el.dataset.msg); break;
-    case 'mod': toggleMod(); break;
-    case 'modtab': modTab = el.dataset.t; renderMod(); break;
-    default: if (a.startsWith('m-')) modAct(a, el);
+    case 'guide': openGuide(0); break;
+    case 'g-next': guideNext(); break;
+    case 'g-back': guideBack(); break;
+    case 'g-close': closeGuide(); break;
   }
 }
 
-/* ================= Testmodus: Skript, Messung, Auswertung ================= */
-const TASKS = [
-  { id:1, title:'Anschluss prüfen mit der heutigen App', variant:'heute', auto:'decision', ref:'Nullmessung für A1 und A2 (Element b)',
-    say:'Du sitzt im Interregio von Zürich nach Brugg. In Brugg willst du das Postauto 17.32 nach Lindenberg nehmen. Um 18.15 schliesst die Kita, dort wartet dein Kind. Gleich meldet sich dein Handy. Finde heraus, ob du dein Postauto noch erreichst, und entscheide, wie du nach Lindenberg fährst. Sag bitte laut, was du denkst.',
-    hyp:'H1: Wenn Testpersonen mit der heutigen App selber nach einer Alternative suchen müssen, dann brauchen sie mehr als 60 Sekunden bis zum Entscheid und bewerten ihr Sicherheitsgefühl mit höchstens 3 von 5.',
-    obs:'Zeit von der Mitteilung bis zum Entscheid, Anzahl Taps, Suchweg (Reisebegleiter oder Fahrplan), gewählte Verbindung (rechtzeitig? Billett gültig?), Äusserungen von Unsicherheit.',
-    crit:'Median > 60 s und Ø Sicherheitsgefühl ≤ 3',
-    rating:{ key:'sicher', q:'Wie sicher fühlst du dich jetzt, dass du rechtzeitig bei der Kita bist? (1 = gar nicht, 5 = sehr sicher)' } },
-  { id:2, title:'Anschluss prüfen mit Plan B', variant:'planb', auto:'decision', ref:'A1 Sicherheitsgefühl, A2 Entscheidungsdauer, B1 Umsteige-Hilfe',
-    say:'Gleiche Situation, gleicher Zug, aber jetzt mit Plan B. Gleich meldet sich dein Handy. Erkläre kurz in eigenen Worten, was los ist, und entscheide, wie du nach Lindenberg fährst.',
-    hyp:'H2: Wenn Plan B einen gefährdeten Anschluss mit Ampel, «wartet bis» und fertiger Alternative meldet, dann entscheiden sich Testpersonen in höchstens 30 Sekunden (mindestens 50 % schneller als mit der heutigen App) und bewerten ihr Sicherheitsgefühl mit mindestens 4 von 5 (mindestens +1 gegenüber heute).',
-    obs:'Zeit bis «Plan B übernehmen», ob Gelb und «wartet bis 17.34» richtig erklärt werden, ob «Andere Verbindungen» geöffnet wird, ob Gleis und Sektor danach ohne Hilfe genannt werden.',
-    crit:'Median ≤ 30 s, ≥ 50 % schneller als Aufgabe 1, Ø Sicherheit ≥ 4 und ≥ +1',
-    rating:{ key:'sicher', q:'Wie sicher fühlst du dich jetzt, dass du rechtzeitig bei der Kita bist? (1 = gar nicht, 5 = sehr sicher)' },
-    checks:[{ key:'ampel', q:'Ampel und «wartet bis» richtig erklärt', opts:['ja','teilweise','nein'] }, { key:'gleis', q:'Nachfrage «Wo steigst du in Brugg um?»: Gleis 4, Sektor B genannt', opts:['ja','nein'] }] },
-  { id:3, title:'Billett-Check', variant:'planb', auto:null, ref:'A3 Vertrauen in die Empfehlung, B2 Billett-Fragen; Pain «Ich weiss nicht, ob mein Billett gilt»',
-    say:'Eine Kollegin schreibt dir: «Nimm doch den Bus über Birrhard, der ist eine Minute schneller.» Schau in der App nach: Kannst du diesen Bus mit deinem Abo fahren?',
-    hyp:'H3: Wenn der Billett-Check direkt bei jeder Verbindung steht, dann erkennen Testpersonen innert 20 Sekunden, dass ihr Abo auf der Verbindung über Birrhard nicht gilt, und vertrauen der Angabe mit mindestens 4 von 5.',
-    obs:'Findet die Person «Andere Verbindungen»? Zeit bis zur richtigen Antwort. Wird «Zusatzbillett nötig» gelesen und verstanden? Zweifel wie «würde ich trotzdem nachprüfen»?',
-    crit:'alle gelöst, Median ≤ 20 s, Ø Vertrauen ≥ 4',
-    rating:{ key:'vertrauen', q:'Wie sehr vertraust du der Angabe, ob dein Abo gilt? (1 = gar nicht, 5 = voll)' } },
-  { id:4, title:'Ankunft teilen', variant:'planb', auto:'share', ref:'Sozialer Job «Wartende informieren», Pain «Jemand wartet auf mich»',
-    say:'Die Kita soll wissen, wann du ungefähr ankommst. Gib ihr Bescheid.',
-    hyp:'H4: Wenn Plan B eine vorformulierte Nachricht mit der neuen Ankunftszeit anbietet, dann informieren Testpersonen die Kita in höchstens 20 Sekunden, ohne den Text selber schreiben zu müssen.',
-    obs:'Weg zu «Ankunft teilen», Zeit und Taps bis «Senden», wird der Text angepasst, Reaktion auf «Ankunft live verfolgen» (Nutzen oder Datenschutz-Bedenken).',
-    crit:'alle gelöst, Median ≤ 20 s',
-    rating:{ key:'nutzen', q:'Wie hilfreich ist diese Funktion für dich? (1 = gar nicht, 5 = sehr)' } },
-  { id:5, title:'Entschädigung', variant:'planb', auto:'comp', ref:'B3 Anteil eingereichter Gesuche; Pain «Die Entschädigung ist Papierkram»',
-    say:'Es ist 20.30 Uhr, du bist zuhause. Am Montag hattest du auf der gleichen Strecke 72 Minuten Verspätung. Hol dir die Entschädigung, die dir zusteht.',
-    hyp:'H5: Wenn das Entschädigungsgesuch schon ausgefüllt ist, dann senden Testpersonen es in höchstens 30 Sekunden ab und geben an, dass sie es so einreichen würden (mindestens 4 von 5).',
-    obs:'Zeit und Taps bis «Gesuch senden», ob die Angaben geprüft werden, Fragen zu Betrag oder Konto, Reaktion auf die Tagesbilanz («Minuten gespart»).',
-    crit:'alle gelöst, Median ≤ 30 s, Ø Absicht ≥ 4',
-    rating:{ key:'absicht', q:'Wie wahrscheinlich würdest du das Gesuch so einreichen? (1 = sicher nicht, 5 = sicher)' } }
+/* ================= Rundgang fuer Erstbesucher ================= */
+const GUIDE_KEY = 'planb-rundgang-v1';
+const narrow = () => matchMedia('(max-width:780px)').matches;
+const shown = sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width && r.height ? e : null; };
+const GUIDE = [
+  { title:'Willkommen bei Plan B',
+    body:`<div class="g-hero"><div class="brand-badge" aria-hidden="true">B</div><span class="g-tag">Anschluss weg? Plan B steht schon.</span></div>
+      <p>Plan B ist eine Idee für die ÖV-App: Hat dein Zug Verspätung und wackelt der Anschluss, bekommst du sofort einen fertigen Plan.</p>
+      <div class="g-story"><b>Deine Rolle:</b> Du bist Matthi. Nach der Arbeit fährst du mit dem Zug von Zürich nach Brugg und dann mit dem Postauto nach Lindenberg. Um <b>18.15</b> schliesst dort die Kita deines Kindes. Heute hat der Zug Verspätung.</div>
+      <p class="g-small">Dauert etwa 3 Minuten. Fahrplan, Orte und Personen sind erfunden.</p>`,
+    primary:'Kurze Einführung', secondary:'Direkt loslegen' },
+  { target:() => shown('.scene-card'), title:'Die Geschichte',
+    body:'<p>Hier siehst du, wo Matthi gerade ist: Uhrzeit, Strecke und was passiert. Die Skizze zeigt, wo der Zug gerade fährt.</p>' },
+  { target:() => shown('#stAct button') || shown('#scActions button'), title:'Zeit vorspulen',
+    body:'<p>Mit dem grünen Knopf geht die Geschichte weiter.</p><p>Ist kein Knopf da, bist du auf dem Handy dran. Ein grüner Tipp sagt dir dann, was du tun kannst.</p>' },
+  { target:() => shown('#phone'), title:'Matthis Handy',
+    body:'<p>Tippe Mitteilungen und Knöpfe an wie in einer echten App. Probier ruhig alles aus, es kann nichts kaputtgehen.</p>' },
+  { target:() => shown('.seg'), title:'Vergleichen',
+    body:'<p>Hier wechselst du zwischen <b>Heute</b> (die App ohne Plan B) und <b>Mit Plan B</b>.</p><p class="g-small">Tipp: Spiel die Szene zuerst mit Plan B durch und dann «Heute». So merkst du den Unterschied am besten.</p>',
+    primary:'Los geht’s' }
 ];
-const INTRO = [
-  { key:'pendeln', q:'Wie oft fährst du mit dem ÖV zur Arbeit oder Schule?', type:'select', opts:['','täglich','3–4 × pro Woche','1–2 × pro Woche','seltener'] },
-  { key:'app', q:'Nutzt du unterwegs SBB Mobile oder eine andere ÖV-App?', type:'select', opts:['','ja, täglich','ja, ab und zu','nein'] },
-  { key:'zuletzt', q:'Wann hast du zuletzt wegen einer Verspätung einen Anschluss verpasst, und was hast du dann gemacht?', type:'text' }
-];
-const OUTRO = [
-  { key:'best', q:'Was hat dir an Plan B am meisten geholfen?', type:'text' },
-  { key:'worst', q:'Was war unklar oder hat dich gestört?', type:'text' },
-  { key:'use', q:'Wie wahrscheinlich würdest du Plan B einschalten? (1–5)', type:'scale', max:5 },
-  { key:'nps', q:'Wie wahrscheinlich empfiehlst du Plan B weiter? (0–10)', type:'scale', max:10, min:0 },
-  { key:'weg', q:'Welche Funktion würdest du weglassen, und was fehlt dir noch?', type:'text' }
-];
-const CHOICE_TXT = { planb:'S-Bahn 17.40 + Bus (rechtzeitig, Abo gilt)', post1732:'Postauto 17.32 (verpasst)', birrhard:'Bus über Birrhard (Zusatzbillett nötig)', post1802:'Postauto 18.02 (zu spät)' };
-const OUT_TXT = { ok:'gelöst', help:'mit Hilfe', fail:'nicht gelöst' };
-
-const STORE = 'planb-prototyp-tests-v1';
-let sessions = [], cur = null, modTab = 'test', run = null, timerInt = null, confirmDel = false, copyText = '', openState = {};
-document.addEventListener('toggle', e => { const d = e.target; if (d.matches && d.matches('details.task[data-k]')) openState[d.dataset.k] = d.open; }, true);
-try { sessions = JSON.parse(localStorage.getItem(STORE) || '[]'); } catch(e){ sessions = []; }
-const save = () => { try { localStorage.setItem(STORE, JSON.stringify(sessions)); } catch(e){} };
-const session = () => sessions.find(s => s.id === cur) || null;
-const activeTask = () => run;
-const taskOrder = s => s && s.order === 'planb-first' ? [2,1,3,4,5] : [1,2,3,4,5];
-const sec = ms => Math.round(ms / 100) / 10;
-
-function log(type){
-  if (!run) return;
-  run.events.push({ t: sec(performance.now() - run.t0), e:type });
+let gStep = -1, gRaf = 0;
+function openGuide(i = 0){
+  gStep = i; $('#guide').hidden = false;
+  document.addEventListener('keydown', gKey); addEventListener('resize', gPlaceSoon); addEventListener('scroll', gPlaceSoon, { passive:true });
+  showGuide();
 }
-function tap(target){ if (run) run.taps++; }
-function taskMark(k){ if (run && run.marks[k] == null) run.marks[k] = sec(performance.now() - run.t0); }
-function taskFlag(k, v){ if (run) run.flags[k] = v; }
-function taskAuto(kind, data){
-  if (!run) return;
-  const tk = TASKS.find(t => t.id === run.id);
-  if (data && data.choice) run.flags.choice = data.choice;
-  if (data && data.rcpt) run.flags.rcpt = data.rcpt;
-  if (tk.auto === kind) endTask('ok', true);
+function closeGuide(){
+  if (gStep < 0) return;
+  gStep = -1; $('#guide').hidden = true;
+  document.removeEventListener('keydown', gKey); removeEventListener('resize', gPlaceSoon); removeEventListener('scroll', gPlaceSoon);
+  try { localStorage.setItem(GUIDE_KEY, '1'); } catch(e){}
+  const btn = shown('#stAct button') || shown('#scActions button');
+  if (btn){ btn.scrollIntoView({ block:'center' }); btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 4200); try { btn.focus({ preventScroll:true }); } catch(e){} }
 }
-function startTask(id){
-  const s = session(); if (!s) return;
-  if (run) endTask('fail');
-  const tk = TASKS.find(t => t.id === id);
-  resetScenario(tk.variant);
-  if (id === 1 || id === 2) go('push');
-  else if (id === 3 || id === 4){ S.chosen = 'planb'; S.shared = false; go('decided'); }
-  else if (id === 5){ S.chosen = 'planb'; S.shared = true; go('evening'); }
-  run = { id, t0: performance.now(), taps:0, events:[], marks:{}, flags:{} };
-  openState = { ['t' + id]: true };
-  if (id === 1 || id === 2) run.events.push({ t:0, e:'push_shown' });
-  clearInterval(timerInt); timerInt = setInterval(updTimer, 250);
-  renderMod(); renderScene();
+function guideNext(){ if (gStep >= GUIDE.length - 1) closeGuide(); else { gStep++; showGuide(); } }
+function guideBack(){ if (gStep > 0){ gStep--; showGuide(); } }
+function gKey(e){
+  if (e.key === 'Escape'){ e.preventDefault(); closeGuide(); }
+  else if (e.key === 'ArrowRight'){ e.preventDefault(); guideNext(); }
+  else if (e.key === 'ArrowLeft'){ e.preventDefault(); guideBack(); }
 }
-function endTask(outcome, auto){
-  if (!run) return;
-  const s = session(); const r = run; run = null; clearInterval(timerInt);
-  if (s){
-    const prev = s.tasks[r.id] || {};
-    s.tasks[r.id] = { ...prev, time: sec(performance.now() - r.t0), taps:r.taps, outcome, auto:!!auto, events:r.events, marks:r.marks, flags:r.flags, at:new Date().toISOString() };
-    save();
-    const nx = taskOrder(s).find(x => !(s.tasks[x] && s.tasks[x].outcome));
-    openState = { ['t' + r.id]: true }; if (nx) openState['t' + nx] = true; else openState.outro = true;
-  }
-  renderMod(); renderScene();
+function showGuide(){
+  const st = GUIDE[gStep], n = GUIDE.length - 1, intro = gStep === 0;
+  $('#gCard').innerHTML = `
+    <div class="g-top">${intro ? '' : `<span class="g-step">Schritt ${gStep} von ${n}</span>`}<button class="g-x" data-act="g-close" aria-label="Einführung schliessen">${I.x}</button></div>
+    <h2 id="gTitle">${st.title}</h2>
+    <div class="g-body">${st.body}</div>
+    <div class="g-act">
+      ${intro ? '' : `<div class="g-dots" aria-hidden="true">${GUIDE.slice(1).map((_, k) => `<i class="${k + 1 === gStep ? 'on' : ''}"></i>`).join('')}</div>`}
+      <span class="sp"></span>
+      ${intro ? `<button class="btn btn-ghost" data-act="g-close">${st.secondary}</button>` : `<button class="btn btn-ghost" data-act="g-back">Zurück</button>`}
+      <button class="btn btn-primary" data-act="g-next" id="gNext">${st.primary || 'Weiter'}</button>
+    </div>`;
+  const t = st.target && st.target();
+  if (t) t.scrollIntoView({ block: narrow() ? 'start' : 'center' });
+  placeGuide();
+  requestAnimationFrame(placeGuide);
+  try { $('#gNext').focus({ preventScroll:true }); } catch(e){}
 }
-function updTimer(){ const el = document.getElementById('runTime'); if (el && run) el.textContent = sec(performance.now() - run.t0).toFixed(1) + ' s'; }
-
-function toggleMod(){
-  const m = $('#mod'), open = m.hidden;
-  m.hidden = !open; $('#stage').classList.toggle('with-mod', open); $('#modBtn').setAttribute('aria-pressed', open);
-  if (open) renderMod();
-  renderScene();
-}
-function modInput(el){
-  const s = session(); const k = el.dataset.m;
-  if (k === 'switch'){ cur = el.value || null; renderMod(); return; }
-  if (k === 'new-tp' || k === 'new-profile' || k === 'new-order' || k === 'import') return;
-  if (!s) return;
-  const [scope, key, tid] = k.split(':');
-  if (scope === 'intro'){ s.intro[key] = el.value; }
-  if (scope === 'outro'){ s.outro[key] = el.value; }
-  if (scope === 'note'){ s.tasks[tid] = s.tasks[tid] || {}; s.tasks[tid].note = el.value; }
-  if (scope === 'profile'){ s.profile = el.value; }
-  save();
-}
-function modAct(a, el){
-  const s = session();
-  switch (a){
-    case 'm-new': {
-      const tp = ($('#newTp').value || '').trim() || ('TP' + (sessions.length + 1));
-      const order = document.querySelector('input[name="newOrder"]:checked')?.value || 'heute-first';
-      const id = 'S' + Date.now();
-      sessions.push({ id, tp, profile: ($('#newProfile').value || '').trim(), order, created:new Date().toISOString(), intro:{}, outro:{}, tasks:{}, quotes:[], done:false });
-      cur = id; openState = {}; save(); renderMod(); break;
-    }
-    case 'm-leave': if (run) endTask('fail'); cur = null; renderMod(); break;
-    case 'm-start': startTask(+el.dataset.id); break;
-    case 'm-end': endTask(el.dataset.o); break;
-    case 'm-set': { // nachtraeglich Ergebnis aendern
-      const t = s && s.tasks[el.dataset.id]; if (t){ t.outcome = el.dataset.o; save(); renderMod(); } break; }
-    case 'm-rate': {
-      const tid = el.dataset.id; s.tasks[tid] = s.tasks[tid] || {}; s.tasks[tid].rating = +el.dataset.v; save(); renderMod(); break; }
-    case 'm-check': {
-      const tid = el.dataset.id; s.tasks[tid] = s.tasks[tid] || {}; s.tasks[tid].checks = s.tasks[tid].checks || {}; s.tasks[tid].checks[el.dataset.k] = el.dataset.v; save(); renderMod(); break; }
-    case 'm-oscale': s.outro[el.dataset.k] = +el.dataset.v; save(); renderMod(); break;
-    case 'm-quote': {
-      const inp = document.getElementById('q-' + el.dataset.id); const v = (inp?.value || '').trim(); if (!v) return;
-      s.quotes.push({ task: el.dataset.id === '0' ? null : +el.dataset.id, text:v }); save(); renderMod(); break; }
-    case 'm-delq': s.quotes.splice(+el.dataset.i, 1); save(); renderMod(); break;
-    case 'm-done': s.done = true; if (run) endTask('fail'); save(); renderMod(); break;
-    case 'm-reopen': s.done = false; save(); renderMod(); break;
-    case 'm-copy-tsv': copyOut(tsvExport()); break;
-    case 'm-copy-json': copyOut(JSON.stringify(sessions, null, 2)); break;
-    case 'm-import': {
-      try { const arr = JSON.parse($('#importBox').value); if (!Array.isArray(arr)) throw 0;
-        arr.forEach(x => { if (x && x.id && !sessions.find(y => y.id === x.id)) sessions.push(x); }); save(); copyText = ''; renderMod();
-      } catch(e){ copyText = 'Import fehlgeschlagen: Bitte den kompletten JSON-Text aus «Rohdaten kopieren» einfügen.'; renderMod(); }
-      break; }
-    case 'm-del': confirmDel = true; renderMod(); break;
-    case 'm-del-no': confirmDel = false; renderMod(); break;
-    case 'm-del-yes': sessions = []; cur = null; confirmDel = false; save(); renderMod(); break;
-  }
-}
-function copyOut(text){
-  copyText = text; renderMod();
-  const ta = document.getElementById('copyOut');
-  const fallback = () => { if (ta){ ta.focus(); ta.select(); } };
-  try { navigator.clipboard.writeText(text).then(() => { const n = document.getElementById('copyNote'); if (n) n.textContent = 'Kopiert. Du kannst es jetzt einfügen.'; }, fallback); } catch(e){ fallback(); }
-}
-
-/* --- Rendern Moderation --- */
-function renderMod(){
-  if ($('#mod').hidden) return;
-  $('#mtTest').setAttribute('aria-pressed', modTab === 'test');
-  $('#mtEval').setAttribute('aria-pressed', modTab === 'eval');
-  const body = $('#modBody'), st = body.scrollTop;
-  body.innerHTML = modTab === 'test' ? modTest() : modEval();
-  body.scrollTop = st; updTimer();
-}
-const scaleHtml = (act, attrs, val, max = 5, min = 1) => `<div class="scale">${Array.from({ length:max - min + 1 }, (_, i) => i + min).map(v => `<button data-act="${act}" ${attrs} data-v="${v}" aria-pressed="${val === v}">${v}</button>`).join('')}</div>`;
-
-function modTest(){
-  const s = session();
-  let h = '';
-  if (!s){
-    h += `<div class="mbox"><h4>Neue Testperson</h4>
-      <div class="mrow"><label class="mlabel">Kürzel<input type="text" id="newTp" data-m="new-tp" placeholder="TP${sessions.length + 1}"></label>
-      <label class="mlabel">Kurzprofil<input type="text" id="newProfile" data-m="new-profile" placeholder="z. B. Lernende, Zug + Bus, täglich"></label></div>
-      <div class="mrow" style="font-size:13px"><label><input type="radio" name="newOrder" value="heute-first" ${sessions.length % 2 === 0 ? 'checked' : ''}> Aufgabe 1 (heute) zuerst</label>
-      <label><input type="radio" name="newOrder" value="planb-first" ${sessions.length % 2 === 1 ? 'checked' : ''}> Aufgabe 2 (Plan B) zuerst</label></div>
-      <p class="small" style="margin:0;color:var(--muted)">Die Reihenfolge von Aufgabe 1 und 2 wechselt von Person zu Person, damit Lerneffekte sich ausgleichen.</p>
-      <div class="mrow"><button class="mbtn pri" data-act="m-new">Session starten</button></div></div>`;
-    if (sessions.length) h += `<div class="mbox"><h4>Bestehende Session öffnen</h4><select data-m="switch"><option value="">Auswählen …</option>${sessions.map(x => `<option value="${x.id}">${esc(x.tp)} · ${x.done ? 'abgeschlossen' : 'offen'}</option>`).join('')}</select></div>`;
-    h += `<div class="mbox"><h4>Ablauf pro Testperson (ca. 10 Min.)</h4><ol class="qlist"><li>Begrüssung und Einverständnis (1 Min.)</li><li>Einstiegsfragen (1,5 Min.)</li><li>Aufgaben 1 bis 5 (6,5 Min.)</li><li>Ausstiegsfragen (1,5 Min.)</li></ol></div>`;
-    return h;
-  }
-  const done = Object.keys(s.tasks).filter(k => s.tasks[k].outcome).length;
-  h += `<div class="mbox"><div class="mrow" style="justify-content:space-between"><div><strong>${esc(s.tp)}</strong> <span class="small" style="color:var(--muted)">· ${s.order === 'planb-first' ? 'Plan B zuerst' : 'heute zuerst'} · ${done} von 5 Aufgaben</span></div>
-    <button class="mbtn" data-act="m-leave">Session schliessen</button></div>
-    <label class="mlabel">Kurzprofil<input type="text" data-m="profile" value="${esc(s.profile)}"></label></div>`;
-
-  h += `<details class="task" data-k="intro" ${(openState.intro ?? done === 0) ? 'open' : ''}><summary><span class="no">E</span>Einstieg<span class="st-chip">${Object.values(s.intro).filter(Boolean).length} / 3</span></summary><div class="task-b">
-    <p class="say"><b>Vorlesen</b>Danke, dass du mitmachst. Wir testen eine Idee für eine ÖV-App, nicht dich. Du kannst nichts falsch machen. Sag bitte immer laut, was du denkst und was du suchst. Bist du einverstanden, dass wir Notizen machen?</p>
-    ${INTRO.map(q => `<label class="mlabel">${q.q}${q.type === 'select' ? `<select data-m="intro:${q.key}">${q.opts.map(o => `<option ${s.intro[q.key] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : `<textarea data-m="intro:${q.key}">${esc(s.intro[q.key] || '')}</textarea>`}</label>`).join('')}
-    <p class="say"><b>Szenario vorlesen</b>Stell dir vor, du bist Matthi. Es ist Dienstag, 17.04 Uhr, Feierabend. Du fährst mit dem Zug von Zürich nach Brugg und dann mit dem Postauto nach Lindenberg. Dort holst du dein Kind in der Kita ab. Die Kita schliesst um 18.15.</p></div></details>`;
-
-  taskOrder(s).forEach((id, idx) => {
-    const tk = TASKS.find(t => t.id === id), r = s.tasks[id] || {};
-    const running = run && run.id === id;
-    const chip = running ? `<span class="st-chip run" id="runTime">0.0 s</span>` : (r.outcome ? `<span class="st-chip ${r.outcome}">${OUT_TXT[r.outcome]} · ${r.time} s</span>` : `<span class="st-chip">offen</span>`);
-    const auto = !Object.values(openState).some(Boolean) && !r.outcome && !run && taskOrder(s).slice(0, idx).every(x => s.tasks[x] && s.tasks[x].outcome);
-    const open = running || (openState['t' + id] ?? auto);
-    h += `<details class="task ${running ? 'run' : (r.outcome ? 'done' : '')}" data-k="t${id}" ${open ? 'open' : ''}><summary><span class="no">${id}</span>${tk.title}${chip}</summary><div class="task-b">
-      <p class="say"><b>Vorlesen</b>${tk.say}</p>
-      <div class="meta"><p><b>Hypothese</b><br>${tk.hyp}</p><p><b>Beobachtungsziel</b><br>${tk.obs}</p><p><b>Erfolgskriterium</b> ${tk.crit}<br><b>Bezug</b> ${tk.ref}</p></div>
-      <div class="mrow">${running
-        ? `<button class="mbtn pri" data-act="m-end" data-o="ok">Gelöst</button><button class="mbtn warn" data-act="m-end" data-o="help">Mit Hilfe</button><button class="mbtn bad" data-act="m-end" data-o="fail">Nicht gelöst</button>`
-        : `<button class="mbtn ${r.outcome ? '' : 'pri'}" data-act="m-start" data-id="${id}">${r.outcome ? 'Nochmals starten' : 'Aufgabe starten'}</button>${r.outcome ? `<span class="small" style="color:var(--muted)">Ergebnis ändern:</span>${['ok','help','fail'].map(o => `<button class="mbtn" data-act="m-set" data-id="${id}" data-o="${o}" ${r.outcome === o ? 'disabled' : ''}>${OUT_TXT[o]}</button>`).join('')}` : ''}`}</div>
-      ${!running && tk.auto ? `<p class="small" style="margin:0;color:var(--muted)">Endet automatisch bei ${{ decision:'der Wahl einer Verbindung', share:'«Senden»', comp:'«Gesuch senden»' }[tk.auto]}.</p>` : ''}
-      ${!running && !tk.auto ? `<p class="small" style="margin:0;color:var(--muted)">Auf «Gelöst» drücken, sobald die Person die richtige Antwort sagt.</p>` : ''}
-      ${r.outcome ? `<div class="metrics"><div class="metric"><span>Zeit</span><strong>${r.time} s</strong></div><div class="metric"><span>Taps</span><strong>${r.taps}</strong></div>
-        ${r.marks && r.marks.pushOpen != null ? `<div class="metric"><span>Mitteilung geöffnet</span><strong>${r.marks.pushOpen} s</strong></div>` : ''}
-        ${r.flags && r.flags.choice ? `<div class="metric" style="grid-column:1/-1"><span>Gewählte Verbindung</span><strong>${CHOICE_TXT[r.flags.choice]}</strong></div>` : ''}
-        ${id === 3 && r.marks ? `<div class="metric"><span>Andere Verbindungen</span><strong>${r.marks.altsOpen != null ? r.marks.altsOpen + ' s' : 'nicht geöffnet'}</strong></div>` : ''}
-        ${id === 4 && r.flags ? `<div class="metric"><span>Text angepasst</span><strong>${r.flags.textEdited ? 'ja' : 'nein'}</strong></div><div class="metric"><span>Live-Link</span><strong>${r.flags.liveOn === false ? 'aus' : 'an'}</strong></div>` : ''}</div>
-        <div class="evlog">${(r.events || []).map(e => `${e.t.toFixed(1)} s · ${esc(e.e)}`).join('<br>') || 'keine Ereignisse'}</div>` : ''}
-      <div class="mlabel">${tk.rating.q}${scaleHtml('m-rate', `data-id="${id}"`, r.rating)}</div>
-      ${(tk.checks || []).map(c => `<div class="mlabel">${c.q}<div class="scale">${c.opts.map(o => `<button style="width:auto;padding:0 10px" data-act="m-check" data-id="${id}" data-k="${c.key}" data-v="${o}" aria-pressed="${(r.checks || {})[c.key] === o}">${o}</button>`).join('')}</div></div>`).join('')}
-      <label class="mlabel">Beobachtungen<textarea data-m="note:x:${id}" placeholder="Was tut die Person? Wo zögert sie?">${esc(r.note || '')}</textarea></label>
-      <div class="mrow"><input type="text" id="q-${id}" placeholder="Zitat wörtlich notieren" style="flex:1 1 160px"><button class="mbtn" data-act="m-quote" data-id="${id}">Zitat +</button></div>
-      ${s.quotes.some(q => q.task === id) ? `<ul class="qlist">${s.quotes.map((q, i) => q.task === id ? `<li>«${esc(q.text)}» <button class="mbtn" style="padding:0 6px" data-act="m-delq" data-i="${i}" aria-label="Zitat löschen">×</button></li>` : '').join('')}</ul>` : ''}
-    </div></details>`;
-  });
-
-  h += `<details class="task" data-k="outro" ${openState.outro ? 'open' : ''}><summary><span class="no">A</span>Ausstieg<span class="st-chip">${Object.values(s.outro).filter(v => v !== '' && v != null).length} / 5</span></summary><div class="task-b">
-    ${OUTRO.map(q => q.type === 'scale' ? `<div class="mlabel">${q.q}${scaleHtml('m-oscale', `data-k="${q.key}"`, s.outro[q.key], q.max, q.min ?? 1)}</div>` : `<label class="mlabel">${q.q}<textarea data-m="outro:${q.key}">${esc(s.outro[q.key] || '')}</textarea></label>`).join('')}
-    <div class="mrow"><input type="text" id="q-0" placeholder="Zitat aus dem Ausstieg" style="flex:1 1 160px"><button class="mbtn" data-act="m-quote" data-id="0">Zitat +</button></div>
-    ${s.quotes.some(q => q.task == null) ? `<ul class="qlist">${s.quotes.map((q, i) => q.task == null ? `<li>«${esc(q.text)}» <button class="mbtn" style="padding:0 6px" data-act="m-delq" data-i="${i}">×</button></li>` : '').join('')}</ul>` : ''}
-    <p class="say"><b>Verabschiedung</b>Vielen Dank! Deine Antworten helfen uns, Plan B zu verbessern. Hier ist dein Dankeschön.</p></div></details>`;
-  h += `<div class="mrow">${s.done ? `<span class="verdict v-ok">Session abgeschlossen</span><button class="mbtn" data-act="m-reopen">Wieder öffnen</button>` : `<button class="mbtn pri" data-act="m-done">Session abschliessen</button>`}<button class="mbtn" data-act="modtab" data-t="eval">Zur Auswertung</button></div>`;
-  return h;
-}
-
-/* --- Auswertung --- */
-const med = a => { const b = a.filter(x => x != null && !isNaN(x)).sort((x, y) => x - y); if (!b.length) return null; const m = Math.floor(b.length / 2); return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
-const avg = a => { const b = a.filter(x => x != null && !isNaN(x)); return b.length ? b.reduce((x, y) => x + y, 0) / b.length : null; };
-const f1 = v => v == null ? '–' : (Math.round(v * 10) / 10).toString();
-function vals(id, k){ return sessions.map(s => s.tasks[id] && s.tasks[id][k]).filter(v => v != null); }
-function outs(id){ return sessions.map(s => s.tasks[id] && s.tasks[id].outcome).filter(Boolean); }
-function hypotheses(){
-  const t1 = med(vals(1,'time')), t2 = med(vals(2,'time')), r1 = avg(vals(1,'rating')), r2 = avg(vals(2,'rating'));
-  const allOk = id => { const o = outs(id); return o.length ? o.every(x => x === 'ok') : null; };
-  const c = (label, val, ok) => ({ label, val, ok });
-  return [
-    { h:'H1', t:'Heute: Entscheid dauert lange, Sicherheit tief', crit:[ c('Median > 60 s', t1 == null ? '–' : f1(t1) + ' s', t1 == null ? null : t1 > 60), c('Ø Sicherheit ≤ 3', f1(r1), r1 == null ? null : r1 <= 3) ] },
-    { h:'H2', t:'Plan B: schneller Entscheid, mehr Sicherheit', crit:[ c('Median ≤ 30 s', t2 == null ? '–' : f1(t2) + ' s', t2 == null ? null : t2 <= 30), c('≥ 50 % schneller als heute', (t1 && t2 != null) ? Math.round((1 - t2 / t1) * 100) + ' %' : '–', (t1 && t2 != null) ? t2 <= t1 * .5 : null),
-      c('Ø Sicherheit ≥ 4', f1(r2), r2 == null ? null : r2 >= 4), c('Sicherheit ≥ +1 ggü. heute', (r1 != null && r2 != null) ? (r2 - r1 >= 0 ? '+' : '') + f1(r2 - r1) : '–', (r1 != null && r2 != null) ? r2 - r1 >= 1 : null) ] },
-    { h:'H3', t:'Billett-Check wird erkannt und geglaubt', crit:[ c('alle gelöst', outs(3).length ? outs(3).filter(x => x === 'ok').length + ' / ' + outs(3).length : '–', allOk(3)), c('Median ≤ 20 s', vals(3,'time').length ? f1(med(vals(3,'time'))) + ' s' : '–', vals(3,'time').length ? med(vals(3,'time')) <= 20 : null), c('Ø Vertrauen ≥ 4', f1(avg(vals(3,'rating'))), avg(vals(3,'rating')) == null ? null : avg(vals(3,'rating')) >= 4) ] },
-    { h:'H4', t:'Ankunft teilen geht schnell', crit:[ c('alle gelöst', outs(4).length ? outs(4).filter(x => x === 'ok').length + ' / ' + outs(4).length : '–', allOk(4)), c('Median ≤ 20 s', vals(4,'time').length ? f1(med(vals(4,'time'))) + ' s' : '–', vals(4,'time').length ? med(vals(4,'time')) <= 20 : null) ] },
-    { h:'H5', t:'Vorausgefülltes Gesuch wird gesendet', crit:[ c('alle gelöst', outs(5).length ? outs(5).filter(x => x === 'ok').length + ' / ' + outs(5).length : '–', allOk(5)), c('Median ≤ 30 s', vals(5,'time').length ? f1(med(vals(5,'time'))) + ' s' : '–', vals(5,'time').length ? med(vals(5,'time')) <= 30 : null), c('Ø Absicht ≥ 4', f1(avg(vals(5,'rating'))), avg(vals(5,'rating')) == null ? null : avg(vals(5,'rating')) >= 4) ] }
-  ].map(x => { const known = x.crit.filter(c => c.ok != null); const okN = known.filter(c => c.ok).length;
-    x.verdict = !known.length ? 'offen' : (known.length < x.crit.length ? (okN === known.length ? 'offen' : 'teilweise') : (okN === x.crit.length ? 'bestätigt' : (okN === 0 ? 'widerlegt' : 'teilweise'))); return x; });
-}
-const vClass = v => ({ 'bestätigt':'v-ok', 'teilweise':'v-part', 'widerlegt':'v-no', 'offen':'v-open' }[v]);
-function modEval(){
-  if (!sessions.length) return `<div class="empty"><b>Noch keine Testdaten.</b><br>Lege im Bereich «Test» eine Testperson an und führe die fünf Aufgaben durch. Hier erscheinen danach Messwerte, Hypothesen-Check und Zitate, bereit zum Kopieren in die Dokumentation.</div>`;
-  let h = `<div class="mbox"><h4>Testpersonen</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>TP</th><th>Profil</th><th>Reihenfolge</th><th>Datum</th><th>Status</th></tr></thead><tbody>
-    ${sessions.map(s => `<tr><td><b>${esc(s.tp)}</b></td><td>${esc(s.profile || '–')}</td><td>${s.order === 'planb-first' ? 'Plan B zuerst' : 'heute zuerst'}</td><td>${new Date(s.created).toLocaleDateString('de-CH')}</td><td>${s.done ? 'abgeschlossen' : 'offen'}</td></tr>`).join('')}</tbody></table></div></div>`;
-  h += `<div class="mbox"><h4>Messwerte je Aufgabe</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>Aufgabe</th>${sessions.map(s => `<th>${esc(s.tp)}</th>`).join('')}</tr></thead><tbody>
-    ${TASKS.map(tk => `<tr><td><b>${tk.id}</b> ${tk.title}</td>${sessions.map(s => { const r = s.tasks[tk.id]; return `<td>${r && r.outcome ? `${r.time} s · ${r.taps} Taps<br>${OUT_TXT[r.outcome]}${r.rating ? ` · ${r.rating}/5` : ''}${r.flags && r.flags.choice ? `<br><span style="color:var(--muted)">${CHOICE_TXT[r.flags.choice]}</span>` : ''}` : '–'}</td>`; }).join('')}</tr>`).join('')}
-    </tbody></table></div></div>`;
-  h += `<div class="mbox"><h4>Hypothesen-Check</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>H</th><th>Kriterium</th><th>Messwert</th><th>erfüllt</th><th>Ergebnis</th></tr></thead><tbody>
-    ${hypotheses().map(x => x.crit.map((c, i) => `<tr>${i === 0 ? `<td rowspan="${x.crit.length}"><b>${x.h}</b><br><span style="color:var(--muted)">${x.t}</span></td>` : ''}<td>${c.label}</td><td>${c.val}</td><td>${c.ok == null ? '–' : (c.ok ? 'ja' : 'nein')}</td>${i === 0 ? `<td rowspan="${x.crit.length}"><span class="verdict ${vClass(x.verdict)}">${x.verdict}</span></td>` : ''}</tr>`).join('')).join('')}
-    </tbody></table></div><p class="small" style="margin:0;color:var(--muted)">Bei wenigen Testpersonen ist das ein Hinweis, kein Beweis. Die Begründung gehört in die Auswertung.</p></div>`;
-  const quotes = sessions.flatMap(s => s.quotes.map(q => ({ ...q, tp:s.tp })));
-  h += `<div class="mbox"><h4>Zitate (${quotes.length})</h4>${quotes.length ? `<ul class="qlist">${quotes.map(q => `<li>«${esc(q.text)}» <span style="color:var(--muted)">(${esc(q.tp)}${q.task ? ', Aufgabe ' + q.task : ', Ausstieg'})</span></li>`).join('')}</ul>` : '<span class="small" style="color:var(--muted)">Noch keine Zitate erfasst.</span>'}</div>`;
-  h += `<div class="mbox"><h4>Ausstieg</h4><div class="tblwrap"><table class="tbl"><thead><tr><th>TP</th><th>Einschalten (1–5)</th><th>Empfehlen (0–10)</th><th>Hilft am meisten</th><th>Unklar / stört</th></tr></thead><tbody>
-    ${sessions.map(s => `<tr><td><b>${esc(s.tp)}</b></td><td>${s.outro.use ?? '–'}</td><td>${s.outro.nps ?? '–'}</td><td>${esc(s.outro.best || '–')}</td><td>${esc(s.outro.worst || '–')}</td></tr>`).join('')}</tbody></table></div></div>`;
-  h += `<div class="mbox"><h4>Für die Dokumentation</h4>
-    <div class="mrow"><button class="mbtn pri" data-act="m-copy-tsv">Tabellen kopieren (für Word)</button><button class="mbtn" data-act="m-copy-json">Rohdaten kopieren (JSON)</button></div>
-    <p class="small" style="margin:0;color:var(--muted)">Word: einfügen, markieren, dann «Tabelle → Text in Tabelle umwandeln» mit Tabstopp. Die JSON-Rohdaten kannst du als Backup aufbewahren oder an Claude geben, um die Auswertung zu schreiben.</p>
-    ${copyText ? `<span class="small" id="copyNote" style="color:var(--accent-strong);font-weight:600">Text unten markiert. Mit Strg+C oder Cmd+C kopieren.</span><textarea class="copyout" id="copyOut" readonly>${esc(copyText)}</textarea>` : ''}</div>`;
-  h += `<div class="mbox"><h4>Daten von einem anderen Gerät übernehmen</h4><textarea id="importBox" data-m="import" placeholder="JSON hier einfügen"></textarea><div class="mrow"><button class="mbtn" data-act="m-import">Importieren</button></div></div>`;
-  h += `<div class="mbox"><h4>Testdaten löschen</h4>${confirmDel ? `<p class="small" style="margin:0">Wirklich alle ${sessions.length} Sessions auf diesem Gerät löschen? Das lässt sich nicht rückgängig machen.</p><div class="mrow"><button class="mbtn bad" data-act="m-del-yes">Ja, alles löschen</button><button class="mbtn" data-act="m-del-no">Abbrechen</button></div>` : `<div class="mrow"><button class="mbtn bad" data-act="m-del">Alle Testdaten löschen</button></div>`}</div>`;
-  return h;
-}
-function tsvExport(){
-  const L = [];
-  L.push('Testpersonen'); L.push(['TP','Profil','Reihenfolge','Datum','Pendeln','App-Nutzung','Zuletzt Anschluss verpasst'].join('\t'));
-  sessions.forEach(s => L.push([s.tp, s.profile, s.order === 'planb-first' ? 'Plan B zuerst' : 'heute zuerst', new Date(s.created).toLocaleDateString('de-CH'), s.intro.pendeln || '', s.intro.app || '', (s.intro.zuletzt || '').replace(/\s+/g,' ')].join('\t')));
-  L.push(''); L.push('Messwerte je Aufgabe'); L.push(['Aufgabe','TP','Zeit (s)','Taps','Ergebnis','Bewertung (1-5)','Gewählte Verbindung','Beobachtungen'].join('\t'));
-  TASKS.forEach(tk => sessions.forEach(s => { const r = s.tasks[tk.id]; if (!r) return;
-    L.push([tk.id + ' ' + tk.title, s.tp, r.time ?? '', r.taps ?? '', r.outcome ? OUT_TXT[r.outcome] : '', r.rating ?? '', r.flags && r.flags.choice ? CHOICE_TXT[r.flags.choice] : '', (r.note || '').replace(/\s+/g,' ')].join('\t')); }));
-  L.push(''); L.push('Hypothesen-Check'); L.push(['Hypothese','Kriterium','Messwert','erfüllt','Ergebnis'].join('\t'));
-  hypotheses().forEach(x => x.crit.forEach((c, i) => L.push([i ? '' : x.h + ' ' + x.t, c.label, c.val, c.ok == null ? '–' : (c.ok ? 'ja' : 'nein'), i ? '' : x.verdict].join('\t'))));
-  L.push(''); L.push('Zitate'); L.push(['TP','Aufgabe','Zitat'].join('\t'));
-  sessions.forEach(s => s.quotes.forEach(q => L.push([s.tp, q.task ? 'Aufgabe ' + q.task : 'Ausstieg', q.text].join('\t'))));
-  L.push(''); L.push('Ausstieg'); L.push(['TP','Einschalten (1-5)','Empfehlen (0-10)','Hilft am meisten','Unklar / stört','Weglassen / fehlt'].join('\t'));
-  sessions.forEach(s => L.push([s.tp, s.outro.use ?? '', s.outro.nps ?? '', (s.outro.best || '').replace(/\s+/g,' '), (s.outro.worst || '').replace(/\s+/g,' '), (s.outro.weg || '').replace(/\s+/g,' ')].join('\t')));
-  return L.join('\n');
+function gPlaceSoon(){ cancelAnimationFrame(gRaf); gRaf = requestAnimationFrame(placeGuide); }
+function placeGuide(){
+  if (gStep < 0) return;
+  const st = GUIDE[gStep], t = st.target && st.target(), spot = $('#gSpot'), card = $('#gCard'), shade = $('#gShade');
+  card.style.left = card.style.top = '';
+  if (!t){ spot.hidden = true; shade.hidden = false; card.className = 'g-card center'; return; }
+  shade.hidden = true; spot.hidden = false;
+  const vw = document.documentElement.clientWidth, vh = innerHeight, r = t.getBoundingClientRect(), pad = 8, m = 16;
+  const top = Math.max(4, r.top - pad), left = Math.max(4, r.left - pad), bottom = Math.min(vh - 4, r.bottom + pad), right = Math.min(vw - 4, r.right + pad);
+  Object.assign(spot.style, { top: top + 'px', left: left + 'px', width: Math.max(0, right - left) + 'px', height: Math.max(0, bottom - top) + 'px' });
+  if (narrow()){ card.className = 'g-card dock'; return; }
+  card.className = 'g-card';
+  const cw = card.offsetWidth, ch = card.offsetHeight;
+  let x, y;
+  if (right + m + cw <= vw - m){ x = right + m; y = r.top; }
+  else if (left - m - cw >= m){ x = left - m - cw; y = r.top; }
+  else if (bottom + m + ch <= vh - m){ x = r.left; y = bottom + m; }
+  else { x = r.left; y = top - m - ch; }
+  card.style.left = Math.min(Math.max(m, x), vw - cw - m) + 'px';
+  card.style.top = Math.min(Math.max(m, y), vh - ch - m) + 'px';
 }
 
 /* ================= Start ================= */
-if (location.hash === '#test') toggleMod();
 render();
 $('#scClock').textContent = hm(S.sim);
-window.__planb = { S, go, act, resetScenario, render, startTask, endTask, sessions: () => sessions, toggleMod, modAct }; // fuer automatische Screenshots
+let seen = false; try { seen = localStorage.getItem(GUIDE_KEY) === '1'; } catch(e){}
+if (!seen) openGuide(0);
+window.__planb = { S, go, act, resetScenario, render, openGuide, closeGuide }; // fuer automatische Tests
 })();
 </script>
 
